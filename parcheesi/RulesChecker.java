@@ -15,20 +15,21 @@ class RulesChecker {
 		return true;
 	}
 
+	class RulesCheckerTester extends Tester {
+		public RulesCheckerTester() {
+			Pawn p = new Pawn(5, "blue");
+
+			check(
+				RulesChecker.validMove(new parcheesi.move.EnterPiece(p), new Board()),
+				"EnterPiece should be valid on an empty Board."
+			);
+
+			summarize();
+		}
+	}
+
 	public static void main(String args[]) {
 		new RulesCheckerTester();
 	}
 }
 
-class RulesCheckerTester extends Tester {
-	public RulesCheckerTester() {
-		Pawn p = new Pawn(5, "blue");
-
-		check(
-			RulesChecker.validMove(new parcheesi.move.EnterPiece(p), new Board()),
-			"EnterPiece should be valid on an empty Board."
-		);
-
-		summarize();
-	}
-}
