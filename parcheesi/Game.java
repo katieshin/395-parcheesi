@@ -1,8 +1,7 @@
 interface Game {
+	// add a player to the game
+	void register(Player p);
 
-    // add a player to the game
-    void register(Player p);
-      
-    // start a game
-    void start();
+	// start a game
+	void start();
 }
