@@ -1,6 +1,7 @@
 package parcheesi.player;
 
 import parcheesi.move.Move;
+import parcheesi.Board;
 
 // NOTE: Do not change this interface!
 public interface Player {

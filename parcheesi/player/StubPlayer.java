@@ -1,6 +1,7 @@
 package parcheesi.player;
 
 import parcheesi.move.Move;
+import parcheesi.Board;
 
 public class StubPlayer implements Player {
 	public StubPlayer() {
