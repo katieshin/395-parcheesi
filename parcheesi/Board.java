@@ -79,12 +79,12 @@ public class Board {
 
 		@Override
 		public int next(Pawn p) {
-			if (p.color.equals(homeColor)) {
+			if (p.getColor().equals(homeColor)) {
 				// Enter the home row.
 				return index + 1;
 			} else {
 				// Skip the home row.
-				return index + spacesPerRow - 1;
+				return index + spacesPerRow;
 			}
 		}
 	}
@@ -260,29 +260,38 @@ public class Board {
 
 					expectedNext = traversed + 1;
 
-					if (location instanceof HomeRow || location instanceof Home) {
+					if (location instanceof Home) {
+						if (location.colors[0].equals(p.getColor())) {
+							boolean fail = false;
+							try {
+								location.next(p);
+								fail = true;
+							} catch (OperationNotSupportedException ex) { }
+							check(!fail, "Home.next(...) throws OperationNotSupportedException.");
+						}
+						continue;
+					}
+
+					if (location instanceof HomeRow) {
 						if (!location.colors[0].equals(p.getColor())) {
 							// The pawn can never reach this location.
 							continue;
+						} else if (traversed == (start + repetitions - 1)) {
+							expectedNextClass = classes[(iteration + 1) % 8];
 						}
 					} else if (location instanceof HomeEntry) {
 						// Special case for location.next(...).
 						if (!((HomeEntry)location).homeColor.equals(p.getColor())) {
 							// Skip all the HomeRows + Home.
-							expectedNext = traversed + rowsPerDimension - 1;
-							// Skip HomeRow.class, Home.class.
-							expectedNextClass = classes[(iteration + 2) % 8];
+							expectedNext += (spacesPerRow - 1);
+							// Skip HomeRow.class, Home.class, go to 3rd next class.
+							expectedNextClass = classes[(iteration + 3) % 8];
+						} else {
+							expectedNextClass = classes[(iteration + 1) % 8];
 						}
-					} else if (location instanceof Home && location.colors[0].equals(p.getColor())) {
-						boolean fail = false;
-						try {
-							location.next(p);
-							fail = true;
-						} catch (OperationNotSupportedException ex) { }
-						check(!fail, "Home.next(...) throws OperationNotSupportedException.");
-					} else if (traversed == (start + repetitions - 1)) {
+					}  else if (traversed == (start + repetitions - 1)) {
 						// If we are on the last repetition, look at the next class.
-						expectedNextClass = classes[iteration + 1 % 8];
+						expectedNextClass = classes[(iteration + 1) % 8];
 					}
 
 					next = location.next(p);
@@ -295,7 +304,7 @@ public class Board {
 					check(
 						expectedNextClass.isInstance(newBoard.locations[next]),
 						"The 'next' Location is an instance of the correct class @ "
-						+ traversed + ", that is: " + expectedNextClass.getSimpleName() + "."
+						+ expectedNext + ", that is: " + expectedNextClass.getSimpleName() + "."
 					);
 				}
 			}
