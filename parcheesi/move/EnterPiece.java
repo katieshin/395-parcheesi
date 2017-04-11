@@ -13,6 +13,8 @@ public class EnterPiece extends SmartMove implements Move {
 		this.pawn=pawn;
 	}
 
+	// FIXME this responsibility should be moved to RulesChecker!
+	// FIXME SmartMove should be deleted; use RulesChecker.validMove(...) instead.
 	public static boolean canMakeMove(Player player, Board board, Die[] dice) {
 		Pawn[] pawnsInStart = board.getPlayerPawnsInStart(player);
 
