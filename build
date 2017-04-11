@@ -1,0 +1,19 @@
+#!/bin/bash
+
+git_project_root=$(git rev-parse --show-toplevel)
+
+working_dir=$(pwd)
+pushd $git_project_root > /dev/null
+
+for f in $*
+do
+  absolute_path="$working_dir/`echo $f | sed -e 's/\.\///g'`"
+  package_path=`echo $absolute_path | sed -e "s#^$git_project_root/##"`
+
+  javac $package_path \
+    && java `echo $package_path | sed -e 's/^\.\///' | sed -e 's/\.java$//' | tr '/' '.'`
+done
+
+$git_project_root/clean
+
+popd > /dev/null
