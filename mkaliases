@@ -1,6 +1,9 @@
 #!/bin/bash
 
-root=$(dirname $0)
+rel_dir=$(dirname $0)
+pushd $rel_dir >/dev/null
+root=$(pwd)
+popd >/dev/null
 
 alias build="$root/build"
 alias clean="$root/clean"
