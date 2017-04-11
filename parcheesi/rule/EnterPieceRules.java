@@ -8,7 +8,7 @@ import parcheesi.Pawn;
 
 import parcheesi.test.Tester;
 
-public class EnterPiece implements Rule {
+public class EnterPieceRules implements Rule {
 	static class ADieIsFive implements Rule {
 		public boolean enforce(Die[] dice, Player player, Board before, Move[] moves, Board after) {
 			for (Die d : dice) {
