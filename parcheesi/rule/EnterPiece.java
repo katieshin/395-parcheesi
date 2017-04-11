@@ -1,10 +1,10 @@
 package parcheesi.rule;
 
+import parcheesi.player.Player;
 import parcheesi.move.Move;
 import parcheesi.die.Die;
 import parcheesi.Board;
 import parcheesi.Pawn;
-import parcheesi.Player;
 
 import parcheesi.test.Tester;
 
@@ -63,7 +63,7 @@ public class EnterPiece implements Rule {
 			 * already full. That will be caught by MaximumSquareOccupancy.
 			 */
 			// Setup for all tests.
-			Player player = new parcheesi.StubPlayer();
+			Player player = new parcheesi.player.StubPlayer();
 			parcheesi.Pawn p = new parcheesi.Pawn(1, "blue");
 
 			parcheesi.move.EnterPiece enterMove = new parcheesi.move.EnterPiece(p);

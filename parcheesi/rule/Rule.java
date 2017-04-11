@@ -1,9 +1,9 @@
 package parcheesi.rule;
 
+import parcheesi.player.Player;
 import parcheesi.move.Move;
 import parcheesi.die.Die;
 import parcheesi.Board;
-import parcheesi.Player;
 
 public interface Rule {
 	// Order of arguments indicates before/after state change.

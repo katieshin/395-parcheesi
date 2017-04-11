@@ -1,4 +1,4 @@
-package parcheesi;
+package parcheesi.player;
 
 import parcheesi.move.Move;
 
