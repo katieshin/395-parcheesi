@@ -32,7 +32,7 @@ public class MoveMainRules implements Rule {
 	}
 	// FIXME: End of misplaced block of responsibility.
 
-	static class MustUseDoubleBonus implements Rule {
+	static class MustUseDoublesBonus implements Rule {
 		public boolean enforce(Die[] dice, Player p, Board before, Move[] moves, Board after) {
 			for (Move m : moves) {
 				// TODO
@@ -41,31 +41,33 @@ public class MoveMainRules implements Rule {
 			return false;
 		}
 
-		public MustUseDoubleBonus() { }
-		public static MustUseDoubleBonus instance = new MustUseDoubleBonus();
+		public MustUseDoublesBonus() { }
+		public static MustUseDoublesBonus instance = new MustUseDoublesBonus();
 	}
 
-	static class MustGiveDoublePenalty implements Rule {
+	static class MustGiveDoublesPenalty implements Rule {
 		public boolean enforce(Die[] dice, Player p, Board before, Move[] moves, Board after) {
+			// FIXME this field is neither public nor existence on Player.
 			if (p.doublesRolled == 2) {
 				// Verify that:
 				// 1) No moves were taken
 				return moves.length == 0
 					// 2) Furthest pawn was forced to restart
+					// FIXME I don't think p can tell which pawn is furthest.
 					&& after.getPositionOfPawn(p.getFurthestPawn()) == -1;
 			}
 			return false;
 		}
 
-		public MustGiveDoublePenalty() { }
-		public static MustGiveDoublePenalty instance = new MustGiveDoublePenalty();
+		public MustGiveDoublesPenalty() { }
+		public static MustGiveDoublesPenalty instance = new MustGiveDoublesPenalty();
 	}
 
-	public NormalMoveRules() { }
-	public static NormalMoveRules instance = new NormalMoveRules();
+	public MoveMainRules() { }
+	public static MoveMainRules instance = new MoveMainRules();
 
 	// NOTE: All must be true relationship.
-	public boolean enforce(Die[] dice, Player p, Board before, Move[] moves, Board after) {
+	public boolean enforce(Die[] dice, Player player, Board before, Move[] moves, Board after) {
 		boolean anyMoveIsMoveMain = false;
 		for (Move m : moves) {
 			anyMoveIsMoveMain |= (m instanceof MoveMain);
@@ -75,8 +77,8 @@ public class MoveMainRules implements Rule {
 
 		if (instance.hasDoubles(dice)) {
 			Die[] newDice = instance.diceWithBonus(dice);
-			return MustUseDoubleBonus.instance.enforce(newDice, player, before, moves, after)
-				&& MustGiveDoublePenalty.instance.enforce(newDice, player, before, moves, after);
+			return MustUseDoublesBonus.instance.enforce(newDice, player, before, moves, after)
+				&& MustGiveDoublesPenalty.instance.enforce(newDice, player, before, moves, after);
 		}
 
 		// None of the rules ended up applying anyway; return true by default.
@@ -84,11 +86,11 @@ public class MoveMainRules implements Rule {
 	}
 
 	public static void main(String[] args) {
-		new NormalMoveRulesTester();
+		new MoveMainRulesTester();
 	}
 
-	static class NormalMoveRulesTester extends parcheesi.test.Tester {
-		public NormalMoveRulesTester() {
+	static class MoveMainRulesTester extends parcheesi.test.Tester {
+		public MoveMainRulesTester() {
 			summarize();
 		}
 	}
