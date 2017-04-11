@@ -16,6 +16,7 @@ public class EnterPiece implements Rule {
 			return false;
 		}
 
+		// NOTE: Singleton.
 		public ADieIsFive () { }
 		public static ADieIsFive instance = new ADieIsFive();
 	}
@@ -29,6 +30,7 @@ public class EnterPiece implements Rule {
 			return sum == 5;
 		}
 
+		// NOTE: Singleton.
 		public DiceSumToFive () { }
 		public static DiceSumToFive instance = new DiceSumToFive();
 	}
@@ -46,6 +48,7 @@ public class EnterPiece implements Rule {
 			|| DiceSumToFive.instance.enforce(moves, dice, before, after);
 	}
 
+	// NOTE: Singleton.
 	public EnterPiece () { }
 	public static EnterPiece instance = new EnterPiece();
 
@@ -111,10 +114,11 @@ public class EnterPiece implements Rule {
 			moves = new Move[] { move4 };
 			check(
 				EnterPiece.instance.enforce(moves, dice, new Board(), new Board()),
-				"Integration test: if no move is an EnterPiece move, then bypass tests. (That is to"
-				+ " say, if no rule in this rule set applies, assume that this rule set is"
-				+ " satisfied because none of its rules can possibly be broken -- they don't matter"
-				+ " in this case.)"
+				"Integration test: if no move is an EnterPiece move, then bypass tests."
+				/* (That is to say, if no rule in this rule set applies, assume that this rule set
+				 *  is satisfied because none of its rules can possibly be broken -- they don't
+				 *  matter in this case.)
+				 */
 			);
 
 			summarize();
