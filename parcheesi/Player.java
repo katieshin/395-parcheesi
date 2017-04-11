@@ -1,3 +1,6 @@
+package parcheesi;
+
+// NOTE: Do not change this interface!
 interface Player {
 
 	// inform the player that a game has started

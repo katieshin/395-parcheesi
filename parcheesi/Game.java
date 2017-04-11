@@ -1,3 +1,6 @@
+package parcheesi;
+
+// NOTE: Do not change this interface!
 interface Game {
 	// add a player to the game
 	void register(Player p);
