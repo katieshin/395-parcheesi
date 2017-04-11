@@ -1,6 +1,12 @@
 #!/bin/bash
 
+git_project_root=$(git rev-parse --show-toplevel)
+
+pushd $git_project_root > /dev/null
+
 for f in $(find parcheesi -type f -name *.class)
 do
   rm $f
 done
+
+popd > /dev/null
