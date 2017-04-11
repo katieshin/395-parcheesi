@@ -37,8 +37,12 @@ public class Tester {
 	 * Summarizes checks made so far.
 	 */
 	protected void summarize() {
+		String divider = repeatString(80, "=");
+
+		System.out.println("\nSummary\n" + divider);
+
 		if (failures == 0) {
-			System.out.println("No failed tests");
+			System.out.println("All " + tests + " tests passed!");
 			return;
 		}
 
@@ -46,9 +50,9 @@ public class Tester {
 			System.out.println(failureSummary);
 		}
 
-		System.out.println(repeatString(8, "=========="));
+		System.out.println(divider);
 
 		float percentageFailed = int2float(failures) / int2float(tests);
-		System.out.println("Percentage of tests failed: " + percentageFailed + "%");
+		System.out.println(failures + " out of " + tests + " tests failed: " + percentageFailed + "%");
 	}
 }
