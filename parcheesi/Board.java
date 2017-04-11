@@ -9,13 +9,30 @@ import parcheesi.Color;
 
 public class Board {
 	abstract class Location {
-		// NOTE: assumed invariant: colors[0] is always dimension/player color for this space.
-		Color[] colors;
+		public Color dimensionColor;
+
+		// NOTE: Colors should be drawn "bottom to top" (color 0 then color 1).
+		Color[] displayColors = new Color[2];
 		int index;
 
-		public Location(Color[] colors, int index) {
-			this.colors = colors;
+		public Location(int index) {
 			this.index  = index;
+
+			/* TODO?: Refactor
+			 * This adjustment wouldn't be necessary if we had started counting at the first
+			 * location in the dimension instead of at the top-left-most space... Oh well.
+			 */
+			int offsetIndex = (index - spacesPerRow) % Board.size;
+			int playerIndex = offsetIndex / dimensionSize;
+
+			this.dimensionColor = Color.valueOf("Player" + (playerIndex + 1));
+
+			this.displayColors[0] = dimensionColor;
+		}
+
+		protected Location(int index, Color primaryDisplayColor) {
+			this(index);
+			this.displayColors[0] = primaryDisplayColor;
 		}
 
 		public int next(Pawn p) throws UnsupportedOperationException {
@@ -28,15 +45,14 @@ public class Board {
 	 * bopping can occur.
 	 */
 	class HomeRow extends Location {
-		public HomeRow(Color color, int index) {
-			super(new Color[] { color }, index);
+		public HomeRow(int index) {
+			super(index);
 		}
 	}
 
 	class Home extends Location {
-		// Home has a Color (the player's color).
-		public Home(Color color, int index) {
-			super(new Color[] { color }, index);
+		public Home(int index) {
+			super(index);
 		}
 
 		@Override
@@ -49,38 +65,31 @@ public class Board {
 
 	class Neutral extends Location {
 		public Neutral (int index) {
-			super(new Color[] { Color.Neutral }, index);
+			super(index, Color.Neutral);
 		}
 	}
 
 	class Safe extends Location {
-		public Safe(Color auxiliaryColor, int index) {
-			super(new Color[] { auxiliaryColor, Color.Safe }, index);
-		}
-
 		public Safe(int index) {
-			super(new Color[] { Color.Safe }, index);
+			super(index, Color.Safe);
 		}
 	}
 
 	class Entry extends Safe {
-		public Entry(Color color, int index) {
-			super(color, index);
+		public Entry(int index) {
+			super(index);
+			this.displayColors[1] = dimensionColor;
 		}
 	}
 
 	class HomeEntry extends Safe {
-		public Color homeColor;
-
-		public HomeEntry(Color homeColor, int index) {
+		public HomeEntry(int index) {
 			super(index);
-
-			this.homeColor = homeColor;
 		}
 
 		@Override
 		public int next(Pawn p) {
-			if (p.getColor().equals(homeColor)) {
+			if (p.getColor().equals(dimensionColor)) {
 				// Enter the home row.
 				return index + 1;
 			} else {
@@ -136,20 +145,20 @@ public class Board {
 			// Entry.
 			if ((i - firstEntryIndex) % dimensionSize == 0) {
 				entryIndex++;
-				locations[i] = new Entry(Color.valueOf("Player" + entryIndex), i);
+				locations[i] = new Entry(i);
 			// Plain Safe.
 			} else if ((i - firstSafeIndex) % dimensionSize == 0) {
 				locations[i] = new Safe(i);
 			// HomeEntry.
 			} else if ((i - firstHomeEntryIndex) % dimensionSize == 0) {
-				locations[i] = new HomeEntry(Color.valueOf("Player" + entryIndex), i);
+				locations[i] = new HomeEntry(i);
 				// Insert the entire home row.
 				int homeRowStart = i;
 				for (i = homeRowStart + 1; i < homeRowStart + (spacesPerRow - 1); i++) {
-					locations[i] = new HomeRow(Color.valueOf("Player" + entryIndex), i);
+					locations[i] = new HomeRow(i);
 				}
 				// Insert Home space.
-				locations[i] = new Home(Color.valueOf("Player" + entryIndex), i);
+				locations[i] = new Home(i);
 			// o/w: Neutral.
 			} else {
 				locations[i] = new Neutral(i);
@@ -278,7 +287,7 @@ public class Board {
 					expectedNext = traversed + 1;
 
 					if (location instanceof Home) {
-						if (location.colors[0].equals(p.getColor())) {
+						if (location.dimensionColor.equals(p.getColor())) {
 							boolean fail = false;
 							try {
 								location.next(p);
@@ -290,7 +299,7 @@ public class Board {
 					}
 
 					if (location instanceof HomeRow) {
-						if (!location.colors[0].equals(p.getColor())) {
+						if (!location.dimensionColor.equals(p.getColor())) {
 							// The pawn can never reach this location.
 							continue;
 						} else if (traversed == (start + repetitions - 1)) {
@@ -298,7 +307,7 @@ public class Board {
 						}
 					} else if (location instanceof HomeEntry) {
 						// Special case for location.next(...).
-						if (!((HomeEntry)location).homeColor.equals(p.getColor())) {
+						if (!location.dimensionColor.equals(p.getColor())) {
 							// Skip all the HomeRows + Home.
 							expectedNext += (spacesPerRow - 1);
 							// Skip HomeRow.class, Home.class, go to 3rd next class.
