@@ -114,6 +114,7 @@ public class Board {
 	Location[] locations = new Location[size];
 	// Pawns on the board.
 	Pawn[] pawns = new Pawn[pawnsPerPlayer * dimensions];
+	int currentPawnIndex = 0;
 	// Pawn coordinates.
 	HashMap<Pawn, Integer> pawnCoordinates = new HashMap<Pawn, Integer>();
 	// Assigned player colors.
@@ -161,6 +162,17 @@ public class Board {
 		}
 
 		return new Board();
+	}
+
+	public void addPawn(Pawn p) throws IllegalStateException {
+		if (currentPawnIndex < pawns.length) {
+			pawns[currentPawnIndex++] = p;
+		} else {
+			throw new IllegalStateException(
+				"Cannot have more than " + pawnsPerPlayer + " pawns per player,"
+				+ " or " + (pawnsPerPlayer * dimensions) + " total."
+			);
+		}
 	}
 
 	public Pawn[] getPlayerPawnsInStart(Player player) {
