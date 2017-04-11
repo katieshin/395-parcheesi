@@ -1,6 +1,6 @@
 package parcheesi;
 
-class Board {
+public class Board {
 	public Board () {
 		// stub
 	}
