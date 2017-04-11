@@ -9,6 +9,7 @@ import parcheesi.Color;
 
 public class Board {
 	abstract class Location {
+		// NOTE: assumed invariant: colors[0] is always dimension/player color for this space.
 		Color[] colors;
 		int index;
 
