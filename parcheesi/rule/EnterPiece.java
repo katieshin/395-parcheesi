@@ -1,8 +1,8 @@
 package parcheesi.rule;
 
 import parcheesi.move.Move;
+import parcheesi.die.Die;
 import parcheesi.Board;
-import parcheesi.Die;
 import parcheesi.Pawn;
 
 import parcheesi.test.Tester;
@@ -52,12 +52,12 @@ public class EnterPiece implements Rule {
 	public EnterPiece () { }
 	public static EnterPiece instance = new EnterPiece();
 
-	public static void main (String[] args) throws parcheesi.Die.InvalidDieException {
+	public static void main (String[] args) throws Die.InvalidDieException {
 		new EnterPieceTester();
 	}
 
 	static class EnterPieceTester extends Tester {
-		public EnterPieceTester () throws parcheesi.Die.InvalidDieException {
+		public EnterPieceTester () throws Die.InvalidDieException {
 			/* NOTE: Don't worry about cases other rules will catch. E.g.; entry square is
 			 * already full. That will be caught by MaximumSquareOccupancy.
 			 */
@@ -66,14 +66,20 @@ public class EnterPiece implements Rule {
 
 			parcheesi.move.EnterPiece enterMove = new parcheesi.move.EnterPiece(p);
 			Move[] moves = new Move[] { enterMove };
-			Die[] dice = new Die[] { new Die(5), new Die(4) };
+			Die[] dice = new parcheesi.die.NormalDie[] {
+				new parcheesi.die.NormalDie(5),
+				new parcheesi.die.NormalDie(4)
+			};
 
 			check(
 				EnterPiece.ADieIsFive.instance.enforce(moves, dice, new Board(), new Board()),
 				"ADieIsFive success check."
 			);
 
-			dice = new Die[] { new Die(4), new Die(1) };
+			dice = new parcheesi.die.NormalDie[] {
+				new parcheesi.die.NormalDie(4),
+				new parcheesi.die.NormalDie(1)
+			};
 			check(
 				!EnterPiece.ADieIsFive.instance.enforce(moves, dice, new Board(), new Board()),
 				"ADieIsFive fail check."
@@ -84,26 +90,38 @@ public class EnterPiece implements Rule {
 				"DiceSumToFive success check."
 			);
 
-			dice = new Die[] { new Die(4), new Die(4) };
+			dice = new parcheesi.die.NormalDie[] {
+				new parcheesi.die.NormalDie(4),
+				new parcheesi.die.NormalDie(4)
+			};
 			check(
 				!EnterPiece.DiceSumToFive.instance.enforce(moves, dice, new Board(), new Board()),
 				"DiceSumToFive fail check."
 			);
 
 			// Integration tests.
-			dice = new Die[] { new Die(4), new Die(1) };
+			dice = new parcheesi.die.NormalDie[] {
+				new parcheesi.die.NormalDie(4),
+				new parcheesi.die.NormalDie(1)
+			};
 			check(
 				EnterPiece.instance.enforce(moves, dice, new Board(), new Board()),
 				"Integration test: Dice sum to 5 is valid for EnterPiece."
 			);
 
-			dice = new Die[] { new Die(5), new Die(1) };
+			dice = new parcheesi.die.NormalDie[] {
+				new parcheesi.die.NormalDie(5),
+				new parcheesi.die.NormalDie(1)
+			};
 			check(
 				EnterPiece.instance.enforce(moves, dice, new Board(), new Board()),
 				"Integration test: Any die is 5 is valid for EnterPiece."
 			);
 
-			dice = new Die[] { new Die(3), new Die(1) };
+			dice = new parcheesi.die.NormalDie[] {
+				new parcheesi.die.NormalDie(3),
+				new parcheesi.die.NormalDie(1)
+			};
 			check(
 				!EnterPiece.instance.enforce(moves, dice, new Board(), new Board()),
 				"Integration test: Dice where neither die is 5 and sum is not 5 are invalid for"
