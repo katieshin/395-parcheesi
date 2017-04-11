@@ -100,7 +100,7 @@ public class Board {
 	/* dist(space s1, corresponding space s2 in the next dimension over) =
 	 *  total # of spaces in a dimension, that is: dimension size.
 	 */
-	static final int dimensionDistance = spacesPerRow * rowsPerDimension;
+	static final int dimensionSize = spacesPerRow * rowsPerDimension;
 
 	// For convenience during Board generation.
 	static final int firstEntryIndex     = spacesPerRow / 2; // + 1 - 1
@@ -132,14 +132,14 @@ public class Board {
 		int i;
 		for (i = 0; i < size; i++) {
 			// Entry.
-			if ((i - firstEntryIndex) % dimensionDistance == 0) {
+			if ((i - firstEntryIndex) % dimensionSize == 0) {
 				entryIndex++;
 				locations[i] = new Entry(Color.valueOf("Player" + entryIndex), i);
 			// Plain Safe.
-			} else if ((i - firstSafeIndex) % dimensionDistance == 0) {
+			} else if ((i - firstSafeIndex) % dimensionSize == 0) {
 				locations[i] = new Safe(i);
 			// HomeEntry.
-			} else if ((i - firstHomeEntryIndex) % dimensionDistance == 0) {
+			} else if ((i - firstHomeEntryIndex) % dimensionSize == 0) {
 				locations[i] = new HomeEntry(Color.valueOf("Player" + entryIndex), i);
 				// Insert the entire home row.
 				int homeRowStart = i;
