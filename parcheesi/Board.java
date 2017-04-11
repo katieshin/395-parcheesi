@@ -311,6 +311,8 @@ public class Board {
 
 			check(orderIsCorrect, "Patterns in the board repeat as expected.");
 
+			// TODO: test getPlayerPawnsInStart, performMove, ...
+
 			summarize();
 		}
 	}
