@@ -23,7 +23,8 @@ public class Board {
 	}
 
 	/* NOTE: Although HomeRow is technically Safe, it doesn't need to extend Safe, because a pawn of
-	 * a color dissimilar to that of the HomeRow locations cannot enter the HomeRow.
+	 * a color dissimilar to that of the HomeRow locations cannot enter the HomeRow and therfore no
+	 * bopping can occur.
 	 */
 	class HomeRow extends Location {
 		public HomeRow(Color color, int index) {
@@ -32,7 +33,7 @@ public class Board {
 	}
 
 	class Home extends Location {
-		// Home has a Color (the player's color), and extends "past" the board.
+		// Home has a Color (the player's color).
 		public Home(Color color, int index) {
 			super(new Color[] { color }, index);
 		}
@@ -97,7 +98,7 @@ public class Board {
 	static final int size = spacesPerRow * rowsPerDimension * dimensions;
 
 	/* dist(space s1, corresponding space s2 in the next dimension over) =
-	 *   (# rows - 1 for the home row) * spaces per row + 1 for the home entry
+	 *  total # of spaces in a dimension, that is: dimension size.
 	 */
 	static final int dimensionDistance = spacesPerRow * rowsPerDimension;
 
@@ -106,10 +107,12 @@ public class Board {
 	static final int firstSafeIndex      = firstEntryIndex + spacesPerRow - 1;
 	static final int firstHomeEntryIndex = firstSafeIndex + (spacesPerRow / 2) + 1;
 
+	// Unlikely that we'll want to change this, but let's use a variable so that we can.
+	static final int pawnsPerPlayer = 4;
+
 	// Board spaces/locations.
 	Location[] locations = new Location[size];
 	// Pawns on the board.
-	static final int pawnsPerPlayer = 4;
 	Pawn[] pawns = new Pawn[pawnsPerPlayer * dimensions];
 	// Pawn coordinates.
 	HashMap<Pawn, Integer> pawnCoordinates = new HashMap<Pawn, Integer>();
@@ -117,13 +120,15 @@ public class Board {
 	HashMap<Player, Color> playerColors = new HashMap<Player, Color>();
 
 	public Board () {
-		/* NOTE: This assumes there is a Color.Player{1, 2, ... i} for 1 <= i <= dimensions.
-		 * In other words: assumes 1 player per dimension and 1 color per player.
+		/* NOTE: Board generation assumes there is a Color.Player{1, 2, ... i} for
+		 * 1 <= i <= dimensions. In other words: assumes 1 player per dimension and 1 color per
+		 * player.
 		 */
 		int entryIndex = 0;
 
-		// Starting in top-left-most space. (The space closest to HomeEntry on the side of Entry.)
-		// And skipping the last 4 spaces -- the "out of bounds" Home spaces.
+		/* Start in top-left-most space. (The space closest to HomeEntry on the side of Entry in
+		 * Player 4's dimension/board-section.)
+		 */
 		int i;
 		for (i = 0; i < size; i++) {
 			// Entry.
