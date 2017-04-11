@@ -6,13 +6,13 @@ You bet it is. (Well, maybe.)
 
 To get `build` and `clean` aliases in your shell:
 
-```
+```sh
 $ . mkaliases
 ```
 
 To `build` a class and run its tests:
 
-```
+```sh
 $ build ./path/to/class.java
 # Example 1:
 $ cd parcheesi/rule; build RulesChecker.java
@@ -23,7 +23,7 @@ $ build parcheesi/rule/RulesChecker.java
 
 To `clean` any lingering `.class` files (should not usually be needed):
 
-```
+```sh
 $ clean
 ```
 
