@@ -1,6 +1,5 @@
 package parcheesi;
 
-import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,7 +17,7 @@ public class Board {
 			this.index  = index;
 		}
 
-		public int next(Pawn p) throws OperationNotSupportedException {
+		public int next(Pawn p) throws UnsupportedOperationException {
 			return index + 1;
 		};
 	}
@@ -39,8 +38,8 @@ public class Board {
 		}
 
 		@Override
-		public int next(Pawn p) throws OperationNotSupportedException {
-			throw new OperationNotSupportedException(
+		public int next(Pawn p) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException(
 				"Cannot call Home.next(...): There is no 'next' after Home."
 			);
 		}
@@ -170,7 +169,7 @@ public class Board {
 		return pawnsInStart.toArray(new Pawn[pawnsInStart.size()]);
 	}
 
-	public static void main(String[] args) throws OperationNotSupportedException {
+	public static void main(String[] args) throws UnsupportedOperationException {
 		new BoardTester();
 	}
 
@@ -184,7 +183,7 @@ public class Board {
 			return count;
 		}
 
-		public BoardTester() throws OperationNotSupportedException {
+		public BoardTester() throws UnsupportedOperationException {
 			Board newBoard = new Board();
 
 			check(
@@ -266,8 +265,8 @@ public class Board {
 							try {
 								location.next(p);
 								fail = true;
-							} catch (OperationNotSupportedException ex) { }
-							check(!fail, "Home.next(...) throws OperationNotSupportedException.");
+							} catch (UnsupportedOperationException ex) { }
+							check(!fail, "Home.next(...) throws UnsupportedOperationException.");
 						}
 						continue;
 					}
