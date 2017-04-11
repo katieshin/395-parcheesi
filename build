@@ -1,8 +1,8 @@
 #!/bin/bash
 
 git_project_root=$(git rev-parse --show-toplevel)
-
 working_dir=$(pwd)
+
 pushd $git_project_root > /dev/null
 
 for f in $*
