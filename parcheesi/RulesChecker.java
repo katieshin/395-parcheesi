@@ -15,7 +15,11 @@ class RulesChecker {
 		return true;
 	}
 
-	class RulesCheckerTester extends Tester {
+	public static void main(String args[]) {
+		new RulesCheckerTester();
+	}
+
+	static class RulesCheckerTester extends Tester {
 		public RulesCheckerTester() {
 			Pawn p = new Pawn(5, "blue");
 
@@ -26,10 +30,6 @@ class RulesChecker {
 
 			summarize();
 		}
-	}
-
-	public static void main(String args[]) {
-		new RulesCheckerTester();
 	}
 }
 
