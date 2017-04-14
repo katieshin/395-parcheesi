@@ -57,12 +57,6 @@ public interface Rule {
 // 	}
 // }
 
-// public class SafetySquareOccupancy implements Rule {
-// 	public boolean enforce (Move[] moves, Die[] dice, Board before, Board after) {
-// 		return false;
-// 	}
-// }
-
 // public class CannotEnterOpponentHomeRow implements Rule {
 // 	public boolean enforce (Move[] moves, Die[] dice, Board before, Board after) {
 // 		return false;
