@@ -3,7 +3,7 @@
 rel_dir=$(dirname $0)
 pushd $rel_dir >/dev/null
 root=$(pwd)
-popd >/dev/null
+popd >/dev/null 2>/dev/null
 
 alias build="$root/build"
 alias clean="$root/clean"
