@@ -10,8 +10,4 @@ public class Pawn {
 		this.id=id;
 		this.color=color;
 	}
-
-	public Color getColor() {
-		return Color.lookupByColorName(this.color);
-	}
 }

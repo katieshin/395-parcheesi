@@ -89,7 +89,8 @@ public class Board {
 
 		@Override
 		public int next(Pawn p) {
-			if (p.getColor().equals(dimensionColor)) {
+			// FIXME: p.color may not be accessible if we refactor.
+			if (Color.lookupByColorName(p.color).equals(dimensionColor)) {
 				// Enter the home row.
 				return index + 1;
 			} else {
@@ -113,6 +114,7 @@ public class Board {
 	static final int dimensionSize = spacesPerRow * rowsPerDimension;
 
 	// For convenience during Board generation.
+	//										this doesn't work correctly for odd spacesPerRow
 	static final int firstEntryIndex     = spacesPerRow / 2; // + 1 - 1
 	static final int firstSafeIndex      = firstEntryIndex + spacesPerRow - 1;
 	static final int firstHomeEntryIndex = firstSafeIndex + (spacesPerRow / 2) + 1;
@@ -124,13 +126,39 @@ public class Board {
 	Location[] locations = new Location[size];
 	// Pawns on the board.
 	Pawn[] pawns = new Pawn[pawnsPerPlayer * dimensions];
-	int currentPawnIndex = 0;
+	HashMap<Integer, Color> pawnColors = new HashMap<Integer, Color>();
 	// Pawn coordinates.
-	HashMap<Pawn, Integer> pawnCoordinates = new HashMap<Pawn, Integer>();
+	HashMap<Integer, Integer> pawnCoordinates = new HashMap<Integer, Integer>();
 	// Assigned player colors.
-	HashMap<Player, Color> playerColors = new HashMap<Player, Color>();
+	Player[] players = new Player[dimensions];
+	HashMap<Integer, Color> playerColors = new HashMap<Integer, Color>();
 
-	public Board () {
+	public Board () throws UnsupportedOperationException {
+		// Assign each player a color.
+		for (int p = 0; p < players.length; p++) {
+			Color playerColor = Color.valueOf("Player" + (p + 1));
+
+			if (playerColor == null) {
+				throw new IllegalStateException(
+						"Cannot instantiate a Board with more Players than there are player colors."
+					);
+			}
+
+			playerColors.put(p, playerColor);
+		}
+
+		// Create pawns for each player.
+		for (int p = 0; p < players.length; p++) {
+			Color color = playerColors.get(p);
+			for (int pw = 0; pw < pawnsPerPlayer; pw++) {
+				int pawnId = p * pawnsPerPlayer + pw;
+				/* NOTE: accoring to Pawn comments + spec, id should be 0-3 and color should be
+				 * String. This isn't ideal for our implementation, but we will work around it.
+				 */
+				pawns[pawnId] = new Pawn(pw, color.getColorName());
+			}
+		}
+
 		/* NOTE: Board generation assumes there is a Color.Player{1, 2, ... i} for
 		 * 1 <= i <= dimensions. In other words: assumes 1 player per dimension and 1 color per
 		 * player.
@@ -174,22 +202,17 @@ public class Board {
 		return new Board();
 	}
 
-	public void addPawn(Pawn p) throws IllegalStateException {
-		if (currentPawnIndex < pawns.length) {
-			pawns[currentPawnIndex++] = p;
-		} else {
-			throw new IllegalStateException(
-				"Cannot have more than " + pawnsPerPlayer + " pawns per player,"
-				+ " or " + (pawnsPerPlayer * dimensions) + " total."
-			);
-		}
-	}
-
 	public Pawn[] getPlayerPawnsInStart(Player player) {
 		ArrayList<Pawn> pawnsInStart = new ArrayList<Pawn>();
 		// If a pawn has the same color as player, and has no coordinate, then it is in start.
 		for (Pawn p : pawns) {
-			if (p.getColor().equals(playerColors.get(player)) && !pawnCoordinates.containsKey(p)) {
+			/* FIXME: p.color is only accessible here because by happy accident Board and Pawn
+			 * currently share the same package (parcheesi). They may not always if we do any
+			 * refactoring at all ever, and so we should make it possible to access p.color via
+			 * another method. (See PLAN.md for an idea.)
+			 */
+			if (Color.lookupByColorName(p.color).equals(playerColors.get(player))
+					&& !pawnCoordinates.containsKey(p)) {
 				pawnsInStart.add(p);
 			}
 		}
@@ -228,6 +251,7 @@ public class Board {
 				numEntries == dimensions
 					&& numHomeEntries == dimensions
 					&& numPlainSafeSpaces == dimensions
+					// FIXME: There is no longer any reason Home cannot extend Safe.
 					&& numHomeSpaces == dimensions
 					&& numSafeSpaces == dimensions * 3,
 				"Every dimension should have 3 Safe spaces: 1 Entry, 1 HomeEntry, and 1 plain Safe."
@@ -247,10 +271,10 @@ public class Board {
 			);
 
 			int[] counts = new int[] {
-				spacesPerRow / 2,
-				1,
-				spacesPerRow - 2,
-				1
+				spacesPerRow / 2, // Neutral
+				1,				  // Entry or HomeEntry
+				spacesPerRow - 2, // Neutral or HomeRow
+				1				  // Safe or Home
 			};
 
 			Class[] classes = new Class[] {
@@ -271,13 +295,12 @@ public class Board {
 			int repetitions, start, expectedNext, next;
 			Class expected, expectedNextClass;
 			Location location;
-			// Choose pawn color such that pawn must travel entire board.
-			Pawn p = new Pawn(1, Color.Player4.getColorName());
+			// Choose pawn color such that pawn must travel entire board it can possibly travel.
+			Pawn p = new Pawn(0, Color.valueOf("Player" + dimensions).getColorName());
 
-			// FIXME Either there is a bug in HomeEntry.next, or this code is broken.
 			for (; traversed < size; iteration++) {
-				repetitions = counts[iteration % 4];
-				expected = expectedNextClass = classes[iteration % 8];
+				repetitions = counts[iteration % counts.length];
+				expected = expectedNextClass = classes[iteration % classes.length];
 				start = traversed;
 
 				for (; traversed < start + repetitions; traversed++) {
@@ -287,7 +310,7 @@ public class Board {
 					expectedNext = traversed + 1;
 
 					if (location instanceof Home) {
-						if (location.dimensionColor.equals(p.getColor())) {
+						if (location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
 							boolean fail = false;
 							try {
 								location.next(p);
@@ -299,25 +322,21 @@ public class Board {
 					}
 
 					if (location instanceof HomeRow) {
-						if (!location.dimensionColor.equals(p.getColor())) {
+						if (!location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
 							// The pawn can never reach this location.
 							continue;
-						} else if (traversed == (start + repetitions - 1)) {
-							expectedNextClass = classes[(iteration + 1) % 8];
 						}
-					} else if (location instanceof HomeEntry) {
-						// Special case for location.next(...).
-						if (!location.dimensionColor.equals(p.getColor())) {
-							// Skip all the HomeRows + Home.
-							expectedNext += (spacesPerRow - 1);
-							// Skip HomeRow.class, Home.class, go to 3rd next class.
-							expectedNextClass = classes[(iteration + 3) % 8];
-						} else {
-							expectedNextClass = classes[(iteration + 1) % 8];
-						}
+					}
+
+					if (location instanceof HomeEntry
+							&& !location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
+						// Skip all the HomeRows + Home.
+						expectedNext += (spacesPerRow - 1);
+						// Skip HomeRow.class, Home.class, go to 3rd next class.
+						expectedNextClass = classes[(iteration + 3) % classes.length];
 					}  else if (traversed == (start + repetitions - 1)) {
 						// If we are on the last repetition, look at the next class.
-						expectedNextClass = classes[(iteration + 1) % 8];
+						expectedNextClass = classes[(iteration + 1) % classes.length];
 					}
 
 					next = location.next(p);
