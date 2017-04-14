@@ -63,3 +63,8 @@ answered.
 4. Rules now have dependencies.
   - BFS of dependency tree tells us which rules need to be run before other rules
   - Memoize the result during a single move to reduce overhead (bonus)
+
+5. PawnKeeper
+  - add package parcheesi.pawn to Pawn and to PawnKeeper
+  - PawnKeeper will have access to Pawn fields/methods
+  - Create static methods for getting info about a Pawn from outside the package
