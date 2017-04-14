@@ -115,9 +115,9 @@ public class Board {
 
 	// For convenience during Board generation.
 	//										this doesn't work correctly for odd spacesPerRow
-	static final int firstEntryIndex     = spacesPerRow / 2; // + 1 - 1
-	static final int firstSafeIndex      = firstEntryIndex + spacesPerRow - 1;
-	static final int firstHomeEntryIndex = firstSafeIndex + (spacesPerRow / 2) + 1;
+	static final int firstSafeIndex      = spacesPerRow / 2 - 1; // + 1 - 1
+	static final int firstHomeEntryIndex = spacesPerRow;
+	static final int firstEntryIndex     = firstHomeEntryIndex + spacesPerRow / 2 + 1;
 
 	// Unlikely that we'll want to change this, but let's use a variable so that we can.
 	static final int pawnsPerPlayer = 4;
