@@ -68,3 +68,12 @@ answered.
   - add package parcheesi.pawn to Pawn and to PawnKeeper
   - PawnKeeper will have access to Pawn fields/methods
   - Create static methods for getting info about a Pawn from outside the package
+
+6. Game
+  - Knows the order in which players take their turns
+  - Keeps track of all turns taken in the game so far
+
+  - Turn[] turnHistory
+    - Either Turn or DoublesBonusTurn
+    - Use sequence of turns to figure out how many doubles a player has rolled
+    - A Turn after a series of "DoublesBonusTurn"s signifies that a new player is playing
