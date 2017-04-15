@@ -7,8 +7,6 @@ import parcheesi.Color;
 import parcheesi.Pawn;
 
 public class SimplePlayer implements Player {
-	int doublesRolled = 0;
-
 	Color color;
 
 	// TODO?
@@ -25,7 +23,6 @@ public class SimplePlayer implements Player {
 	}
 
 	public void DoublesPenalty() {
-		doublesRolled = 0;
 		// TODO
 		// getFurthestPawn().restart();
 	}

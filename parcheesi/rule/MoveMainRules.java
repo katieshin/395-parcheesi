@@ -47,15 +47,31 @@ public class MoveMainRules implements Rule {
 
 	static class MustGiveDoublesPenalty implements Rule {
 		public boolean enforce(Die[] dice, Player p, Board before, Move[] moves, Board after) {
-			// FIXME this field is neither public nor existence on Player.
-			if (p.doublesRolled == 2) {
+			// FIXME Game is not implemented yet.
+			// if in the most recent turn, it was the 2nd DoublesBonusTurn and doubles were rolled:
+			//   then and only then, the penalty has to be applied.
+			Turn currentTurn = Game.currentTurn();
+
+			// If the currentTurn was given as a doubles bonus
+			if (currentTurn instanceof DoublesBonusTurn
+					// And it was the 2nd such doubles bonus turn, and you rolled doubles on it
+					&& currentTurn.doublesRolled == 3) {
+				// Then we must apply the penalty.
+
 				// Verify that:
-				// 1) No moves were taken
-				return moves.length == 0
-					// 2) Furthest pawn was forced to restart
-					// FIXME I don't think p can tell which pawn is furthest.
-					&& after.getPositionOfPawn(p.getFurthestPawn()) == -1;
+				// (1) 1 Move is taken
+				if (currentTurn.movesTaken.length == 1) {
+					Move onlyMove = currentTurn.movesTaken.get(0);
+
+					// (2) The move taken is a DoublesPenalty move
+					if (onlyMove instanceof DoublesPenaltyMove) {
+						// (3) The DoublesPenaltyMove was enforced correctly
+						Pawn furthestPawn = before.furthestPawnOfPlayer(p);
+						return before.removePawn(furthestPawn).equals(after);
+					}
+				}
 			}
+
 			return false;
 		}
 

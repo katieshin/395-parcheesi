@@ -17,14 +17,45 @@ answered.
 
 - ~~SmartMove is dumb and we're getting rid of it~~
 - Pawn.getColor doesn't belong there
-- Player should not own doubles count
-- Player should not know which pawn is furthest on Board
+- ~~Player should not own doubles count~~
+- ~~Player should not know which pawn is furthest on Board~~
 - Make sure code is organized top-down (Helpers after helped methods)
 - How will we calculate pawn distance from Entry accurately? (Aren't doing this yet)
 - Board should not own performMove()
   - TranslatedMoves have a method called apply()
 - Move constants in Board to Parameters.java (or some other config file)
 - Use try/catch to clean up `throws` spew in NormalDieTester and DoublesBonusDie
+
+## Handling Doubles Penalty
+
+- Special Move DoublesPenaltyMove which becomes the only move in that DoublesBonusTurn
+- This move is set as your Turn's only move if and only if, after rolling the dice for the 2nd
+  DoublesBonusTurn (3rd consecutive Turn total), you roll doubles. Both dice are used, so you cannot
+  translate any moves. 1 move is added: DoublesPenaltyMove. That becomes your Turn.
+- This responsibility will probably be handled in Game. It will roll your dice and give you your
+  Turn, and that Turn might be a Turn in which you can make no choices (either no moves are
+  available to you, or you incurred a DoublesPenalty and that is your only move), and the player
+  should still be presented with some message, and then the Turn should be applied and the rules
+  checked.
+
+# Board Interface (Need this)
+
+1. movePawnForward
+2. removePawn
+
+						// !!Doesn't belong here!!
+						// Location loc = before.getPawnLocation(pawn);
+						// before.setPawnCoordinate(pawn, loc.next(pawn));
+						MoveMain.apply(Board board) {
+							board.movePawn(this.pawn, this.die);
+						}
+
+						Board.movePawnForward(Pawn pawn, int count) {
+							for (int i = 0; i < count; i++) {
+								Location loc = getPawnLocation(pawn);
+								setPawnCoordinate(pawn, loc.next(pawn));
+							}
+						}
 
 ## New stuff to make way for
 
