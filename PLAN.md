@@ -16,7 +16,7 @@ answered.
 ## Cruft (Stuff to clean up)
 
 - ~~SmartMove is dumb and we're getting rid of it~~
-- Pawn.getColor doesn't belong there
+- ~~Pawn.getColor doesn't belong there~~
 - ~~Player should not own doubles count~~
 - ~~Player should not know which pawn is furthest on Board~~
 - Make sure code is organized top-down (Helpers after helped methods)
