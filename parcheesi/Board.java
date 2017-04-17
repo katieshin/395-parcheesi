@@ -9,23 +9,18 @@ import parcheesi.Color;
 
 public class Board {
 	abstract class Location {
+
+		int index;
 		public Color dimensionColor;
 
 		// NOTE: Colors should be drawn "bottom to top" (color 0 then color 1).
 		Color[] displayColors = new Color[2];
-		int index;
 
 		public Location(int index) {
 			this.index  = index;
 
-			/* TODO?: Refactor
-			 * This adjustment wouldn't be necessary if we had started counting at the first
-			 * location in the dimension instead of at the top-left-most space... Oh well.
-			 */
-			int offsetIndex = (index - spacesPerRow) % Board.size;
-			int playerIndex = offsetIndex / dimensionSize;
-
-			this.dimensionColor = Color.valueOf("Player" + (playerIndex + 1));
+			int dimension = this.index / dimensionSize;
+			this.dimensionColor = Color.valueOf("Player" + (dimension + 1));
 
 			this.displayColors[0] = dimensionColor;
 		}
@@ -110,13 +105,10 @@ public class Board {
 	static final int dimensionSize = spacesPerRow * rowsPerDimension;
 
 	// For convenience during Board generation.
-	//										this doesn't work correctly for odd spacesPerRow
-	// static final int firstSafeIndex      = spacesPerRow / 2 - 1; // + 1 - 1
-	// static final int firstHomeEntryIndex = spacesPerRow;
-	// static final int firstEntryIndex     = firstHomeEntryIndex + spacesPerRow / 2 + 1;
-	static final int firstEntryIndex     = spacesPerRow / 2;
-	static final int firstSafeIndex      = firstEntryIndex + spacesPerRow - 1;
-	static final int firstHomeEntryIndex = firstSafeIndex + spacesPerRow / 2 + 1;
+	// !! FIXME?: this doesn't work correctly for odd spacesPerRow
+	static final int firstSafeIndex      = spacesPerRow / 2 - 1;
+	static final int firstHomeEntryIndex = spacesPerRow;
+	static final int firstEntryIndex     = firstHomeEntryIndex + spacesPerRow + (spacesPerRow / 2);
 
 	// Unlikely that we'll want to change this, but let's use a variable so that we can.
 	static final int pawnsPerPlayer = 4;
@@ -135,7 +127,7 @@ public class Board {
 	public Board () throws UnsupportedOperationException {
 		// Assign each player a color.
 		for (int p = 0; p < players.length; p++) {
-			Color playerColor = Color.valueOf("Player" + (p + 1));
+			Color playerColor = Color.forPlayer(p);
 
 			if (playerColor == null) {
 				throw new IllegalStateException(
@@ -158,34 +150,25 @@ public class Board {
 			}
 		}
 
-		/* NOTE: Board generation assumes there is a Color.Player{1, 2, ... i} for
-		 * 1 <= i <= dimensions. In other words: assumes 1 player per dimension and 1 color per
-		 * player.
-		 */
-		int entryIndex = 0;
-
-		/* Start in top-left-most space. (The space closest to HomeEntry on the side of Entry in
-		 * Player 4's dimension/board-section.)
-		 */
+		// Start at the first space (counter clockwise) of the 1st player's dimension.
 		int i;
 		for (i = 0; i < size; i++) {
-			// Entry.
-			if ((i - firstEntryIndex) % dimensionSize == 0) {
-				entryIndex++;
-				locations[i] = new Entry(i);
 			// Plain Safe.
-			} else if ((i - firstSafeIndex) % dimensionSize == 0) {
+			if ((i - firstSafeIndex) % dimensionSize == 0) {
 				locations[i] = new Safe(i);
 			// HomeEntry.
 			} else if ((i - firstHomeEntryIndex) % dimensionSize == 0) {
 				locations[i] = new HomeEntry(i);
-				// Insert the entire home row.
-				int homeRowStart = i;
-				for (i = homeRowStart + 1; i < homeRowStart + (spacesPerRow - 1); i++) {
+				// Insert Home row.
+				int homeEntryIndex = i;
+				for (i = homeEntryIndex + 1; i < homeEntryIndex + (spacesPerRow - 1); i++) {
 					locations[i] = new HomeRow(i);
 				}
-				// Insert Home space.
+				// Insert Home.
 				locations[i] = new Home(i);
+			// Entry.
+			} else if ((i - firstEntryIndex) % dimensionSize == 0) {
+				locations[i] = new Entry(i);
 			// o/w: Neutral.
 			} else {
 				locations[i] = new Neutral(i);
@@ -237,14 +220,23 @@ public class Board {
 
 			check(
 				newBoard.locations.length == Board.size,
-				"A Board should have Board.size locations."
+				"A Board should have Board.size locations"
 			);
 
-			int numEntries = countLocationsOfType(Entry.class, newBoard);
-			int numHomeEntries = countLocationsOfType(HomeEntry.class, newBoard);
-			int numHomeSpaces = countLocationsOfType(Home.class, newBoard);
-			int numHomeRowSpaces = countLocationsOfType(HomeRow.class, newBoard);
-			int numSafeSpaces = countLocationsOfType(Safe.class, newBoard);
+			boolean noNullLocations = true;
+			for (Location l : newBoard.locations) {
+				noNullLocations &= (l != null);
+			}
+			check(
+				noNullLocations,
+				"No locations are null"
+			);
+
+			int numEntries         = countLocationsOfType(Entry.class, newBoard);
+			int numHomeEntries     = countLocationsOfType(HomeEntry.class, newBoard);
+			int numHomeSpaces      = countLocationsOfType(Home.class, newBoard);
+			int numHomeRowSpaces   = countLocationsOfType(HomeRow.class, newBoard);
+			int numSafeSpaces      = countLocationsOfType(Safe.class, newBoard);
 			int numPlainSafeSpaces = numSafeSpaces
 				- (numEntries + numHomeEntries + numHomeRowSpaces + numHomeSpaces);
 
@@ -267,12 +259,12 @@ public class Board {
 			check(
 				// spacesPerRow - 1 for Home, -1 for HomeEntry = spacesPerRow - 2
 				numHomeRowSpaces == dimensions * (spacesPerRow - 2),
-				"Every dimension should have" + (spacesPerRow - 2) + " HomeRow spaces"
+				"Every dimension should have " + (spacesPerRow - 2) + " HomeRow spaces"
 			);
 			check(
 				numSafeSpaces == dimensions * (4 + (spacesPerRow - 2)),
 				"Every dimension should have " + (4 + (spacesPerRow - 2)) + " Safe spaces:"
-				+ " 1 Entry, 1 HomeEntry, 1 plain Safe, 1 Home," + (spacesPerRow - 2) + " HomeRow spaces"
+				+ " 1 Entry, 1 HomeEntry, 1 plain Safe, 1 Home, " + (spacesPerRow - 2) + " HomeRow spaces"
 			);
 			check(
 				countLocationsOfType(Neutral.class, newBoard)
@@ -280,57 +272,80 @@ public class Board {
 				"All remaining (non-safe) spaces should be Neutral"
 			);
 
+			// NOTE: counts is symmetric around HomeRow. That's neat.
 			int[] counts = new int[] {
-				spacesPerRow / 2, // Neutral
-				1,				  // Entry or HomeEntry
-				spacesPerRow - 2, // Neutral or HomeRow
-				1				  // Safe or Home
+				(spacesPerRow / 2) - 1, // Neutral
+				1,                      // Safe
+				spacesPerRow / 2,       // Neutral
+				1,                      // HomeEntry
+				spacesPerRow - 2,       // HomeRow
+				1,                      // Home
+				spacesPerRow / 2,       // Neutral
+				1,                      // Entry
+				(spacesPerRow / 2) - 1  // Neutral
 			};
 
 			Class[] classes = new Class[] {
-				Neutral.class,
-				Entry.class,
 				Neutral.class,
 				Safe.class,
 				Neutral.class,
 				HomeEntry.class,
 				HomeRow.class,
-				Home.class
+				Home.class,
+				Neutral.class,
+				Entry.class,
+				Neutral.class
 			};
 
 			boolean orderIsCorrect = true;
 
 			int traversed = 0;
 			int iteration = 0;
-			int repetitions, start, expectedNext, next;
-			Class expected, expectedNextClass;
-			Location location;
-			// Choose pawn color such that pawn must travel entire board it can possibly travel.
-			Pawn p = new Pawn(0, Color.valueOf("Player" + dimensions).getColorName());
+
+			int repetitions, start, expectedNext, nextIndex;
+			Color expectedColor;
+			Class expectedClass, expectedNextClass;
+			Location location, nextLocation;
+
+			// Choose pawn color such that pawn must travel starting as close to 0 as possible.
+			Pawn p = new Pawn(0, Color.forPlayer(0).getColorName());
 
 			for (; traversed < size; iteration++) {
-				repetitions = counts[iteration % counts.length];
-				expected = expectedNextClass = classes[iteration % classes.length];
-				start = traversed;
+				repetitions   = counts[iteration % counts.length];
+				expectedClass = classes[iteration % classes.length];
+				expectedColor = Color.forPlayer(traversed / dimensionSize);
+				start         = traversed;
 
 				for (; traversed < start + repetitions; traversed++) {
 					location = newBoard.locations[traversed];
-					orderIsCorrect &= expected.isInstance(location);
+					orderIsCorrect &= expectedClass.isInstance(location);
 
-					expectedNext = traversed + 1;
+					check(
+						orderIsCorrect,
+						"Location @ " + traversed + " is of expected class " + expectedClass.getSimpleName()
+					);
 
+					check(
+						location.dimensionColor.equals(expectedColor),
+						"Location @ " + traversed + " is of expected color " + expectedColor.getColorName()
+					);
+
+					// If we are on a Home space, we cannot actually have any expectedNext[Class].
 					if (location instanceof Home) {
+						// Either we should throw an Error if we try to go next() on our own Home...
 						if (location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
 							boolean fail = false;
 							try {
 								location.next(p);
 								fail = true;
 							} catch (UnsupportedOperationException ex) { }
-							check(!fail, "Home.next(...) throws UnsupportedOperationException.");
+							check(!fail, "Home.next(...) throws UnsupportedOperationException");
 						}
+						// Or we cannot be here at all; this is another player's home.
 						continue;
 					}
 
+					// And if we are on a different player's HomeRow, ...
 					if (location instanceof HomeRow) {
 						if (!location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
 							// The pawn can never reach this location.
@@ -338,33 +353,48 @@ public class Board {
 						}
 					}
 
-					if (location instanceof HomeEntry
-							&& !location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
-						// Skip all the HomeRows + Home.
-						expectedNext += (spacesPerRow - 1);
-						// Skip HomeRow.class, Home.class, go to 3rd next class.
-						expectedNextClass = classes[(iteration + 3) % classes.length];
-					}  else if (traversed == (start + repetitions - 1)) {
-						// If we are on the last repetition, look at the next class.
+					// Otherwise, we at first expect for "next" to be our current index + 1.
+					expectedNext = traversed + 1;
+
+					// If the next space is off the board, don't test it.
+					if (expectedNext == size) {
+						continue;
+					}
+
+					// We expect the class of the next space to be the same as the current class...
+					expectedNextClass = expectedClass;
+					// Unless we are on the last repetition, in which case it should be of the next class.
+					if (traversed == (start + repetitions - 1)) {
 						expectedNextClass = classes[(iteration + 1) % classes.length];
 					}
 
-					next = location.next(p);
+					// If this is a HomeEntry, and not our HomeEntry, ...
+					if (location instanceof HomeEntry
+							&& !location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
+						// We expect next to come after this player's HomeRow + Home.
+						expectedNext += (spacesPerRow - 1);
+						// And it should be of the class coming after HomeRow.class and Home.class in sequence.
+						expectedNextClass = classes[(iteration + 3) % classes.length];
+					}
+
+					// Now get the actual values.
+					nextIndex = location.next(p);
+					nextLocation = newBoard.locations[nextIndex];
+
 					check(
-						next == expectedNext,
-						"The 'next' index changes correctly @ " + traversed
-						+ " to " + expectedNext + "."
+						nextIndex == expectedNext,
+						"The nextIndex changes correctly @ " + traversed + " to " + expectedNext
 					);
 
 					check(
-						expectedNextClass.isInstance(newBoard.locations[next]),
-						"The 'next' Location is an instance of the correct class @ "
-						+ expectedNext + ", that is: " + expectedNextClass.getSimpleName() + "."
+						expectedNextClass.isInstance(nextLocation),
+						"The nextLocation is an instance of the correct class @ " + expectedNext + ", that is: "
+						+ expectedNextClass.getSimpleName()
 					);
 				}
 			}
 
-			check(orderIsCorrect, "Patterns in the board repeat as expected.");
+			check(orderIsCorrect, "Patterns in the board repeat as expected");
 
 			// TODO: test getPlayerPawnsInStart, performMove, ...
 

@@ -24,6 +24,10 @@ public enum Color {
 		return this.hex;
 	}
 
+	public static Color forPlayer(int i) {
+		return Color.valueOf("Player" + (i + 1));
+	}
+
 	public static Color lookupByColorName(String name) {
 		for (Color c: values()) {
 			if (c.getColorName().equals(name)) return c;
