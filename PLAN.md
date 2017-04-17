@@ -21,7 +21,7 @@ answered.
 - ~~Player should not know which pawn is furthest on Board~~
 - Make sure code is organized top-down (Helpers after helped methods)
 - How will we calculate pawn distance from Entry accurately? (Aren't doing this yet)
-- Board should not own performMove()
+- ~~Board should not own performMove()~~
   - TranslatedMoves have a method called apply()
 - ~~Move constants in Board to Parameters.java (or some other config file)~~
 - Use try/catch to clean up `throws` spew in NormalDieTester and DoublesBonusDie

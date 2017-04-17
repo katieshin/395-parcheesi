@@ -157,14 +157,6 @@ public class Board {
 		}
 	}
 
-	public Board performMove(Move m) {
-		if (m instanceof parcheesi.move.EnterPiece) {
-			// TODO
-		}
-
-		return new Board();
-	}
-
 	public Pawn[] getPlayerPawnsInStart(Player player) {
 		ArrayList<Pawn> pawnsInStart = new ArrayList<Pawn>();
 		// If a pawn has the same color as player, and has no coordinate, then it is in start.
