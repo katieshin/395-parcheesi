@@ -1,9 +1,16 @@
 #!/bin/bash
 
 rel_dir=$(dirname $0)
-pushd $rel_dir >/dev/null
+
+if [ $rel_dir != "." ]; then
+  pushd $rel_dir >/dev/null
+fi
+
 root=$(pwd)
-popd >/dev/null 2>/dev/null
+
+if [ $rel_dir != "." ]; then
+  popd >/dev/null 2>/dev/null
+fi
 
 alias build="$root/build"
 alias clean="$root/clean"
