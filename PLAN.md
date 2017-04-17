@@ -23,7 +23,7 @@ answered.
 - How will we calculate pawn distance from Entry accurately? (Aren't doing this yet)
 - Board should not own performMove()
   - TranslatedMoves have a method called apply()
-- Move constants in Board to Parameters.java (or some other config file)
+- ~~Move constants in Board to Parameters.java (or some other config file)~~
 - Use try/catch to clean up `throws` spew in NormalDieTester and DoublesBonusDie
 
 ## Handling Doubles Penalty

@@ -3,6 +3,9 @@ package parcheesi;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static parcheesi.Parameters.Board.*;
+import static parcheesi.Parameters.pawnsPerPlayer;
+
 import parcheesi.player.Player;
 import parcheesi.move.Move;
 import parcheesi.Color;
@@ -90,28 +93,6 @@ public class Board {
 			}
 		}
 	}
-
-	// Board size constants.
-	static final int spacesPerRow = 8;
-	// NOTE: Must be odd (in order to be in middle).
-	static final int rowsPerDimension = 3;
-	// NOTE: If a different dimension is chosen, renderer will need to be refactored.
-	static final int dimensions = 4;
-	static final int size = spacesPerRow * rowsPerDimension * dimensions;
-
-	/* dist(space s1, corresponding space s2 in the next dimension over) =
-	 *  total # of spaces in a dimension, that is: dimension size.
-	 */
-	static final int dimensionSize = spacesPerRow * rowsPerDimension;
-
-	// For convenience during Board generation.
-	// !! FIXME?: this doesn't work correctly for odd spacesPerRow
-	static final int firstSafeIndex      = spacesPerRow / 2 - 1;
-	static final int firstHomeEntryIndex = spacesPerRow;
-	static final int firstEntryIndex     = firstHomeEntryIndex + spacesPerRow + (spacesPerRow / 2);
-
-	// Unlikely that we'll want to change this, but let's use a variable so that we can.
-	static final int pawnsPerPlayer = 4;
 
 	// Board spaces/locations.
 	Location[] locations = new Location[size];
@@ -208,7 +189,7 @@ public class Board {
 	static class BoardTester extends parcheesi.test.Tester {
 		int countLocationsOfType (Class classObject, Board b) {
 			int count = 0;
-			for (int i = 0; i < Board.size; i++) {
+			for (int i = 0; i < size; i++) {
 				// System.out.println(i + " " + b.locations[i].getClass().getSimpleName());
 				if (classObject.isInstance(b.locations[i])) count++;
 			}
@@ -219,8 +200,8 @@ public class Board {
 			Board newBoard = new Board();
 
 			check(
-				newBoard.locations.length == Board.size,
-				"A Board should have Board.size locations"
+				newBoard.locations.length == size,
+				"A Board should have Parameters.Board.size locations"
 			);
 
 			boolean noNullLocations = true;
@@ -268,7 +249,7 @@ public class Board {
 			);
 			check(
 				countLocationsOfType(Neutral.class, newBoard)
-					== Board.size - numSafeSpaces,
+					== size - numSafeSpaces,
 				"All remaining (non-safe) spaces should be Neutral"
 			);
 
