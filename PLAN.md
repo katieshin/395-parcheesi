@@ -43,19 +43,19 @@ answered.
 1. movePawnForward
 2. removePawn
 
-						// !!Doesn't belong here!!
-						// Location loc = before.getPawnLocation(pawn);
-						// before.setPawnCoordinate(pawn, loc.next(pawn));
-						MoveMain.apply(Board board) {
-							board.movePawn(this.pawn, this.die);
-						}
+	// !!Doesn't belong here!!
+	// Location loc = before.getPawnLocation(pawn);
+	// before.setPawnCoordinate(pawn, loc.next(pawn));
+	MoveMain.apply(Board board) {
+		board.movePawn(this.pawn, this.die);
+	}
 
-						Board.movePawnForward(Pawn pawn, int count) {
-							for (int i = 0; i < count; i++) {
-								Location loc = getPawnLocation(pawn);
-								setPawnCoordinate(pawn, loc.next(pawn));
-							}
-						}
+	Board.movePawnForward(Pawn pawn, int count) {
+		for (int i = 0; i < count; i++) {
+			Location loc = getPawnLocation(pawn);
+			setPawnCoordinate(pawn, loc.next(pawn));
+		}
+	}
 
 ## New stuff to make way for
 
