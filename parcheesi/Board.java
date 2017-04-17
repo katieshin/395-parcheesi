@@ -40,17 +40,19 @@ public class Board {
 		};
 	}
 
-	/* NOTE: Although HomeRow is technically Safe, it doesn't need to extend Safe, because a pawn of
-	 * a color dissimilar to that of the HomeRow locations cannot enter the HomeRow and therfore no
-	 * bopping can occur.
-	 */
-	class HomeRow extends Location {
-		public HomeRow(int index) {
-			super(index);
+	class Neutral extends Location {
+		public Neutral (int index) {
+			super(index, Color.Neutral);
 		}
 	}
 
-	class Home extends Location {
+	class Safe extends Location {
+		public Safe(int index) {
+			super(index, Color.Safe);
+		}
+	}
+
+	class Home extends Safe {
 		public Home(int index) {
 			super(index);
 		}
@@ -63,15 +65,9 @@ public class Board {
 		}
 	}
 
-	class Neutral extends Location {
-		public Neutral (int index) {
-			super(index, Color.Neutral);
-		}
-	}
-
-	class Safe extends Location {
-		public Safe(int index) {
-			super(index, Color.Safe);
+	class HomeRow extends Safe {
+		public HomeRow(int index) {
+			super(index);
 		}
 	}
 
@@ -247,30 +243,41 @@ public class Board {
 			int numEntries = countLocationsOfType(Entry.class, newBoard);
 			int numHomeEntries = countLocationsOfType(HomeEntry.class, newBoard);
 			int numHomeSpaces = countLocationsOfType(Home.class, newBoard);
+			int numHomeRowSpaces = countLocationsOfType(HomeRow.class, newBoard);
 			int numSafeSpaces = countLocationsOfType(Safe.class, newBoard);
-			int numPlainSafeSpaces = numSafeSpaces - numEntries - numHomeEntries;
+			int numPlainSafeSpaces = numSafeSpaces
+				- (numEntries + numHomeEntries + numHomeRowSpaces + numHomeSpaces);
 
 			check(
-				numEntries == dimensions
-					&& numHomeEntries == dimensions
-					&& numPlainSafeSpaces == dimensions
-					// FIXME: There is no longer any reason Home cannot extend Safe.
-					&& numHomeSpaces == dimensions
-					&& numSafeSpaces == dimensions * 3,
-				"Every dimension should have 3 Safe spaces: 1 Entry, 1 HomeEntry, and 1 plain Safe."
+				numEntries == dimensions,
+				"Every dimension should have 1 Entry"
 			);
-
-			int numHomeRowSpaces = countLocationsOfType(HomeRow.class, newBoard);
+			check(
+				numHomeEntries == dimensions,
+				"Every dimension should have 1 HomeEntry"
+			);
+			check(
+				numPlainSafeSpaces == dimensions,
+				"Every dimension should have 1 plain Safe"
+			);
+			check(
+				numHomeSpaces == dimensions,
+				"Every dimension should have 1 Home"
+			);
 			check(
 				// spacesPerRow - 1 for Home, -1 for HomeEntry = spacesPerRow - 2
 				numHomeRowSpaces == dimensions * (spacesPerRow - 2),
-				"A board should have " + (spacesPerRow - 2) + " HomeRow spaces per dimension/player."
+				"Every dimension should have" + (spacesPerRow - 2) + " HomeRow spaces"
 			);
-
+			check(
+				numSafeSpaces == dimensions * (4 + (spacesPerRow - 2)),
+				"Every dimension should have " + (4 + (spacesPerRow - 2)) + " Safe spaces:"
+				+ " 1 Entry, 1 HomeEntry, 1 plain Safe, 1 Home," + (spacesPerRow - 2) + " HomeRow spaces"
+			);
 			check(
 				countLocationsOfType(Neutral.class, newBoard)
-					== Board.size - (numHomeSpaces + numHomeRowSpaces + numSafeSpaces),
-				"All remaining spaces should be Neutral."
+					== Board.size - numSafeSpaces,
+				"All remaining (non-safe) spaces should be Neutral"
 			);
 
 			int[] counts = new int[] {
