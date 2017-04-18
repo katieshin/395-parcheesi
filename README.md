@@ -1,6 +1,7 @@
 # Parcheesi
+### Jordan Timmerman and Katie Shin
 
-You bet it is. (Well, maybe.)
+...
 
 ## Getting started
 
