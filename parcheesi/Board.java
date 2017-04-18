@@ -102,7 +102,7 @@ public class Board {
 	Player[] players = new Player[dimensions];
 	HashMap<Integer, Color> playerColors = new HashMap<Integer, Color>();
 
-	public Board () throws UnsupportedOperationException {
+	public Board () throws IllegalStateException {
 		// TODO: Currently we assume there will be as many players as dimensions. There could be fewer.
 		// Assign each player a color.
 		for (int p = 0; p < players.length; p++) {
