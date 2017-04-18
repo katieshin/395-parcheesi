@@ -34,7 +34,7 @@ public class Board {
 		}
 
 		public int next(Pawn p) throws UnsupportedOperationException {
-			return index + 1;
+			return (index + 1) % size;
 		};
 	}
 
@@ -96,16 +96,14 @@ public class Board {
 
 	// Board spaces/locations.
 	Location[] locations = new Location[size];
-	// Pawns on the board.
-	Pawn[] pawns = new Pawn[pawnsPerPlayer * dimensions];
-	HashMap<Integer, Color> pawnColors = new HashMap<Integer, Color>();
-	// Pawn coordinates.
-	HashMap<Integer, Integer> pawnCoordinates = new HashMap<Integer, Integer>();
+	// Pawns on the board (coordinates).
+	HashMap<Pawn, Integer> pawnCoordinates = new HashMap<Pawn, Integer>();
 	// Assigned player colors.
 	Player[] players = new Player[dimensions];
 	HashMap<Integer, Color> playerColors = new HashMap<Integer, Color>();
 
 	public Board () throws UnsupportedOperationException {
+		// TODO: Currently we assume there will be as many players as dimensions. There could be fewer.
 		// Assign each player a color.
 		for (int p = 0; p < players.length; p++) {
 			Color playerColor = Color.forPlayer(p);
@@ -117,18 +115,6 @@ public class Board {
 			}
 
 			playerColors.put(p, playerColor);
-		}
-
-		// Create pawns for each player.
-		for (int p = 0; p < players.length; p++) {
-			Color color = playerColors.get(p);
-			for (int pw = 0; pw < pawnsPerPlayer; pw++) {
-				int pawnId = p * pawnsPerPlayer + pw;
-				/* NOTE: accoring to Pawn comments + spec, id should be 0-3 and color should be
-				 * String. This isn't ideal for our implementation, but we will work around it.
-				 */
-				pawns[pawnId] = new Pawn(pw, color.getColorName());
-			}
 		}
 
 		// Start at the first space (counter clockwise) of the 1st player's dimension.
@@ -157,21 +143,74 @@ public class Board {
 		}
 	}
 
-	public Pawn[] getPlayerPawnsInStart(Player player) {
-		ArrayList<Pawn> pawnsInStart = new ArrayList<Pawn>();
-		// If a pawn has the same color as player, and has no coordinate, then it is in start.
-		for (Pawn p : pawns) {
-			/* FIXME: p.color is only accessible here because by happy accident Board and Pawn
-			 * currently share the same package (parcheesi). They may not always if we do any
-			 * refactoring at all ever, and so we should make it possible to access p.color via
-			 * another method. (See PLAN.md for an idea.)
+	public ArrayList<Integer> getPlayerPawnIndicesInStart(int playerIndex) {
+		ArrayList<Integer> pawnsNotInStart = new ArrayList<Integer>();
+
+		// If a pawn has the same color as player and has a coordinate, remove it from pawnsInStart.
+		for (Pawn p : pawnCoordinates.keySet()) {
+			/* FIXME: p.color and p.id are only accessible here because by happy accident Board and Pawn
+			 * currently share the same package (parcheesi). They may not always if we do any refactoring
+			 * at all ever, and so we should make it possible to access p.color via another method. (See
+			 * PLAN.md for an idea.)
 			 */
-			if (Color.lookupByColorName(p.color).equals(playerColors.get(player))
-					&& !pawnCoordinates.containsKey(p)) {
-				pawnsInStart.add(p);
+			if (Color.lookupByColorName(p.color).equals(playerColors.get(playerIndex))) {
+				pawnsNotInStart.add(p.id);
 			}
 		}
-		return pawnsInStart.toArray(new Pawn[pawnsInStart.size()]);
+
+		int numberOfPawnsInStart = pawnsPerPlayer - pawnsNotInStart.size();
+		ArrayList<Integer> pawnsInStart = new ArrayList<Integer>(numberOfPawnsInStart);
+
+		for (int i = 0; i < pawnsPerPlayer; i++) {
+			if (!pawnsNotInStart.contains(i)) pawnsInStart.add(i);
+		}
+
+		return pawnsInStart;
+	}
+
+	private int getPlayerEntryIndex(int playerIndex) {
+		return firstEntryIndex + (dimensionSize * playerIndex);
+	}
+
+	public int getPawnCoordinate(Pawn pawn) {
+		if (!pawnCoordinates.containsKey(pawn)) {
+			return -1;
+		}
+
+		return pawnCoordinates.get(pawn);
+	}
+
+	private void setPawnCoordinate(Pawn pawn, int coordinate) {
+		pawnCoordinates.put(pawn, coordinate);
+	}
+
+	public boolean movePawnForward(Pawn pawn, int spaces) {
+		int currentCoordinate = getPawnCoordinate(pawn);
+		Location currentLocation = locations[currentCoordinate];
+
+		for (int i = 0; i < spaces; i++) {
+			if (currentLocation instanceof Home) {
+				return false;
+			}
+			currentLocation = locations[currentLocation.next(pawn)];
+		}
+
+		setPawnCoordinate(pawn, currentLocation.index);
+
+		return true;
+	}
+
+	public boolean addPawn(Pawn pawn) {
+		if (pawnCoordinates.containsKey(pawn)) {
+			return false;
+		}
+
+		int playerIndex = Color.lookupByColorName(pawn.color).ordinal();
+		int playerEntryIndex = getPlayerEntryIndex(playerIndex);
+
+		setPawnCoordinate(pawn, playerEntryIndex);
+
+		return true;
 	}
 
 	public static void main(String[] args) throws UnsupportedOperationException {
@@ -179,6 +218,16 @@ public class Board {
 	}
 
 	static class BoardTester extends parcheesi.test.Tester {
+		public BoardTester() throws UnsupportedOperationException {
+			boardGeneration();
+			getPlayerEntryIndex();
+			addPawn();
+			playerPawnIndicesInStart();
+			movePawnForward();
+
+			summarize();
+		}
+
 		int countLocationsOfType (Class classObject, Board b) {
 			int count = 0;
 			for (int i = 0; i < size; i++) {
@@ -188,7 +237,7 @@ public class Board {
 			return count;
 		}
 
-		public BoardTester() throws UnsupportedOperationException {
+		void boardGeneration() {
 			Board newBoard = new Board();
 
 			check(
@@ -204,6 +253,20 @@ public class Board {
 				noNullLocations,
 				"No locations are null"
 			);
+
+			check(
+				newBoard.playerColors.size() == dimensions,
+				"Every player is assigned a color"
+			);
+
+			for (int i : newBoard.playerColors.keySet()) {
+				Color expected = Color.forPlayer(i);
+				String expectedName = expected.getColorName();
+				check(
+					newBoard.playerColors.get(i).equals(expected),
+					"Player " + i + " is assigned the correct color for Player" + i + ", " + expectedName
+				);
+			}
 
 			int numEntries         = countLocationsOfType(Entry.class, newBoard);
 			int numHomeEntries     = countLocationsOfType(HomeEntry.class, newBoard);
@@ -281,7 +344,7 @@ public class Board {
 			Location location, nextLocation;
 
 			// Choose pawn color such that pawn must travel starting as close to 0 as possible.
-			Pawn p = new Pawn(0, Color.forPlayer(0).getColorName());
+			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
 
 			for (; traversed < size; iteration++) {
 				repetitions   = counts[iteration % counts.length];
@@ -306,10 +369,10 @@ public class Board {
 					// If we are on a Home space, we cannot actually have any expectedNext[Class].
 					if (location instanceof Home) {
 						// Either we should throw an Error if we try to go next() on our own Home...
-						if (location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
+						if (location.dimensionColor.equals(Color.lookupByColorName(pawn.color))) {
 							boolean fail = false;
 							try {
-								location.next(p);
+								location.next(pawn);
 								fail = true;
 							} catch (UnsupportedOperationException ex) { }
 							check(!fail, "Home.next(...) throws UnsupportedOperationException");
@@ -320,7 +383,7 @@ public class Board {
 
 					// And if we are on a different player's HomeRow, ...
 					if (location instanceof HomeRow) {
-						if (!location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
+						if (!location.dimensionColor.equals(Color.lookupByColorName(pawn.color))) {
 							// The pawn can never reach this location.
 							continue;
 						}
@@ -343,7 +406,7 @@ public class Board {
 
 					// If this is a HomeEntry, and not our HomeEntry, ...
 					if (location instanceof HomeEntry
-							&& !location.dimensionColor.equals(Color.lookupByColorName(p.color))) {
+							&& !location.dimensionColor.equals(Color.lookupByColorName(pawn.color))) {
 						// We expect next to come after this player's HomeRow + Home.
 						expectedNext += (spacesPerRow - 1);
 						// And it should be of the class coming after HomeRow.class and Home.class in sequence.
@@ -351,7 +414,7 @@ public class Board {
 					}
 
 					// Now get the actual values.
-					nextIndex = location.next(p);
+					nextIndex = location.next(pawn);
 					nextLocation = newBoard.locations[nextIndex];
 
 					check(
@@ -368,10 +431,125 @@ public class Board {
 			}
 
 			check(orderIsCorrect, "Patterns in the board repeat as expected");
+		}
 
-			// TODO: test getPlayerPawnsInStart, performMove, ...
+		void getPlayerEntryIndex() {
+			Board board = new Board();
 
-			summarize();
+			int actualFirstEntryIndex = board.getPlayerEntryIndex(0);
+			check(
+				actualFirstEntryIndex == firstEntryIndex,
+				"The entry index for the first player is at the first entry index: " + firstEntryIndex
+			);
+
+			boolean subsequentEntriesAreDimensionSizeApart = true;
+			for (int i = 1; i < dimensions - 1; i++) {
+				subsequentEntriesAreDimensionSizeApart &=
+					(actualFirstEntryIndex + dimensionSize * i == board.getPlayerEntryIndex(i));
+			}
+			check(
+				subsequentEntriesAreDimensionSizeApart,
+				"Subsequent entries are all " + dimensionSize + " apart"
+			);
+		}
+
+		void addPawn() {
+			Board board = new Board();
+
+			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
+
+			check(
+				board.getPawnCoordinate(pawn) == -1,
+				"The returned coordinate for a pawn not yet on the board is -1"
+			);
+
+			check(
+				board.addPawn(pawn),
+				"Adding Player 1's first pawn to the board succeeds"
+			);
+
+			check(
+				board.getPawnCoordinate(pawn) == board.getPlayerEntryIndex(0),
+				"A pawn added for Player 1 is placed in in Player 1's Entry"
+			);
+
+			check(
+				!board.addPawn(pawn),
+				"Trying to add Player 1's first pawn to the board a second time fails"
+			);
+		}
+
+		void playerPawnIndicesInStart() {
+			Board board = new Board();
+
+			for (int i = 0; i < dimensions; i++) {
+				check(
+					board.getPlayerPawnIndicesInStart(0).size() == pawnsPerPlayer,
+					"All pawns of a player who has added no pawns to the board will be in start ("
+					+ (i + 1) + ")"
+				);
+			}
+
+			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
+
+			board.addPawn(pawn);
+
+			ArrayList<Integer> expectedPawnsInStart = new ArrayList<Integer>(pawnsPerPlayer - 1);
+			for (int i = 1; i < pawnsPerPlayer; i++) expectedPawnsInStart.add(i);
+
+			check(
+				board.getPlayerPawnIndicesInStart(0).containsAll(expectedPawnsInStart),
+				"If a player has entered only Pawn 0, then all other Pawn ids { 1, ... } are still in start"
+			);
+
+			Pawn pawn2 = new Pawn(1, Color.forPlayer(0).getColorName());
+			Pawn pawn3 = new Pawn(2, Color.forPlayer(0).getColorName());
+			Pawn pawn4 = new Pawn(3, Color.forPlayer(0).getColorName());
+
+			board.addPawn(pawn2);
+			board.addPawn(pawn3);
+			board.addPawn(pawn4);
+
+			check(
+				board.getPlayerPawnIndicesInStart(0).size() == 0,
+				"If a player has entered all their pawns, then no pawns are still in start"
+			);
+		}
+
+		void movePawnForward() {
+			Board board = new Board();
+			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
+			board.addPawn(pawn);
+			check(
+				board.movePawnForward(pawn, 1),
+				"Moving a pawn forward 1 from Entry should succeed"
+			);
+
+			// Count of spaces remaining after the entry before the next dimension
+			int spacesLeftAfterEntry = dimensionSize - entryIndexRelativeToDimensionStart;
+			// Count of spaces from player Entry to player HomeEntry
+			int spacesToHomeEntry = spacesLeftAfterEntry
+				+ mainRingSizePerDimension * (dimensions - 1)
+				+ homeEntryIndexRelativeToDimensionStart;
+			check(
+				board.movePawnForward(pawn, spacesToHomeEntry),
+				"Moving a pawn to its HomeEntry (" + spacesToHomeEntry + " spaces) should succeed"
+			);
+
+			check(
+				!board.movePawnForward(pawn, (spacesPerRow - 1)),
+				"Moving a pawn past Home should fail (1)"
+			);
+
+			check(
+				board.movePawnForward(pawn, (spacesPerRow - 1) - 1),
+				"Moving a pawn to Home should succeed"
+			);
+
+			check(
+				!board.movePawnForward(pawn, 1),
+				"Moving a pawn past Home should fail (2)"
+			);
 		}
 	}
 }
