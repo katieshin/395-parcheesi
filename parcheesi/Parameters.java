@@ -38,6 +38,7 @@ class Parameters {
 		static final int safeIndexRelativeToDimensionStart = firstSafeIndex;
 		static final int homeEntryIndexRelativeToDimensionStart = firstHomeEntryIndex;
 		static final int entryIndexRelativeToDimensionStart = firstEntryIndex;
+		static final int spacesLeftAfterEntry = dimensionSize - entryIndexRelativeToDimensionStart;
 	}
 
 	// Unlikely that we'll want to change this, but let's use a variable so that we can.

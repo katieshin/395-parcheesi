@@ -214,6 +214,30 @@ public class Board {
 		return true;
 	}
 
+	// TODO: Visibility?
+	int pawnAbsoluteDistance(Pawn pawn) {
+		int currentCoordinate = getPawnCoordinate(pawn);
+
+		// If you're in start, your distance along the board is 0.
+		if (currentCoordinate == -1) {
+			return 0;
+		}
+
+		// Otherwise, your distance along the board is...
+		// FIXME: Access to pawn.color may not be possible if refactor. (As elsewhere.)
+		int pawnStart = getPlayerEntryIndex(Color.lookupByColorName(pawn.color).ordinal());
+		// Starting from the shortest distance...
+		int shortestDistance = currentCoordinate - pawnStart;
+
+		// If it's a negative shortest distance, we need to flip it around:
+		if (shortestDistance < 0) {
+			return size - shortestDistance;
+		}
+
+		// Otherwise, it's the same:
+		return shortestDistance;
+	}
+
 	public static void main(String[] args) throws UnsupportedOperationException {
 		new BoardTester();
 	}
@@ -225,6 +249,7 @@ public class Board {
 			addPawn();
 			playerPawnIndicesInStart();
 			movePawnForward();
+			pawnAbsoluteDistance();
 
 			summarize();
 		}
@@ -526,8 +551,6 @@ public class Board {
 				"Moving a pawn forward 1 from Entry should succeed"
 			);
 
-			// Count of spaces remaining after the entry before the next dimension
-			int spacesLeftAfterEntry = dimensionSize - entryIndexRelativeToDimensionStart;
 			// Count of spaces from player Entry to player HomeEntry
 			int spacesToHomeEntry = spacesLeftAfterEntry
 				+ mainRingSizePerDimension * (dimensions - 1)
@@ -550,6 +573,72 @@ public class Board {
 			check(
 				!board.movePawnForward(pawn, 1),
 				"Moving a pawn past Home should fail (2)"
+			);
+		}
+
+		void pawnAbsoluteDistance() {
+			Board board = new Board();
+			Pawn pawn = new Pawn(0, Color.forPlayer(1).getColorName());
+
+			boolean moveSucceeds;
+			int oldDistance;
+			int newDistance;
+
+			newDistance = board.pawnAbsoluteDistance(pawn);
+
+			check(
+				newDistance == 0,
+				"If a pawn is in start, its distance along the board is 0."
+			);
+
+			moveSucceeds = board.addPawn(pawn);
+			newDistance  = board.pawnAbsoluteDistance(pawn);
+
+			check(
+				moveSucceeds && newDistance == 0,
+				"A pawn in start can enter successfully, and its new distance along the board is 0"
+			);
+
+			oldDistance  = newDistance;
+			moveSucceeds = board.movePawnForward(pawn, spacesLeftAfterEntry);
+			newDistance  = board.pawnAbsoluteDistance(pawn);
+
+			check(
+				moveSucceeds && (newDistance - oldDistance == spacesLeftAfterEntry),
+				"Moving the pawn forward to next dimension causes absolute distance increase"
+				+ "  " + spacesLeftAfterEntry
+			);
+
+			// FIXME: this structure is repetitve. How can we refactor?
+			oldDistance  = newDistance;
+			moveSucceeds = board.movePawnForward(pawn, spacesPerRow);
+			newDistance  = board.pawnAbsoluteDistance(pawn);
+
+			check(
+				moveSucceeds && (newDistance - oldDistance) == spacesPerRow,
+				"Moving the pawn forward another 1 row succeeds and causes absolute distance "
+				+ spacesPerRow
+			);
+
+			oldDistance  = newDistance;
+			// NOTE: Spaces to move forward: 1 (leave HomeEntry space)
+			moveSucceeds = board.movePawnForward(pawn, 1);
+			newDistance  = board.pawnAbsoluteDistance(pawn);
+
+			check(
+				moveSucceeds && (newDistance - oldDistance) == spacesPerRow,
+				"Moving the pawn over a different pawn's HomeEntry jumps; absolute distance increase"
+				+ " " + spacesPerRow
+			);
+
+			oldDistance  = newDistance;
+			moveSucceeds = board.movePawnForward(pawn, spacesPerRow);
+			newDistance  = board.pawnAbsoluteDistance(pawn);
+
+			check(
+				moveSucceeds && (newDistance - oldDistance) == spacesPerRow,
+				"Moving the pawn through the last row of this dimension succeeds, distance = distance +"
+				+ " " + spacesPerRow
 			);
 		}
 	}
