@@ -11,6 +11,7 @@ import parcheesi.move.Move;
 import parcheesi.Color;
 
 public class Board {
+	// TODO: Refactor into parchessi.board.Board and parcheesi.board.Location.{...} (clean up).
 	abstract class Location {
 
 		int index;
@@ -23,7 +24,7 @@ public class Board {
 			this.index  = index;
 
 			int dimension = this.index / dimensionSize;
-			this.dimensionColor = Color.valueOf("Player" + (dimension + 1));
+			this.dimensionColor = Color.forPlayer(dimension);
 
 			this.displayColors[0] = dimensionColor;
 		}
@@ -146,7 +147,7 @@ public class Board {
 	public ArrayList<Integer> getPlayerPawnIndicesInStart(int playerIndex) {
 		ArrayList<Integer> pawnsNotInStart = new ArrayList<Integer>();
 
-		// If a pawn has the same color as player and has a coordinate, remove it from pawnsInStart.
+		// If a pawn has the same color as player and has a coordinate, add to pawnsNotInStart.
 		for (Pawn p : pawnCoordinates.keySet()) {
 			/* FIXME: p.color and p.id are only accessible here because by happy accident Board and Pawn
 			 * currently share the same package (parcheesi). They may not always if we do any refactoring
