@@ -7,6 +7,8 @@ import static parcheesi.Parameters.Board.*;
 import static parcheesi.Parameters.pawnsPerPlayer;
 
 import parcheesi.player.Player;
+import parcheesi.pawn.PawnWhisperer;
+import parcheesi.pawn.Pawn;
 import parcheesi.move.Move;
 import parcheesi.Color;
 
@@ -15,10 +17,10 @@ public class Board {
 	abstract class Location {
 
 		int index;
-		public Color dimensionColor;
+		public Color.Player dimensionColor;
 
 		// NOTE: Colors should be drawn "bottom to top" (color 0 then color 1).
-		Color[] displayColors = new Color[2];
+		Color.ColorEnum[] displayColors = new Color.ColorEnum[2];
 
 		public Location(int index) {
 			this.index  = index;
@@ -29,7 +31,7 @@ public class Board {
 			this.displayColors[0] = dimensionColor;
 		}
 
-		protected Location(int index, Color primaryDisplayColor) {
+		protected Location(int index, Color.Space primaryDisplayColor) {
 			this(index);
 			this.displayColors[0] = primaryDisplayColor;
 		}
@@ -41,13 +43,13 @@ public class Board {
 
 	class Neutral extends Location {
 		public Neutral (int index) {
-			super(index, Color.Neutral);
+			super(index, Color.Space.Neutral);
 		}
 	}
 
 	class Safe extends Location {
 		public Safe(int index) {
-			super(index, Color.Safe);
+			super(index, Color.Space.Safe);
 		}
 	}
 
@@ -84,8 +86,7 @@ public class Board {
 
 		@Override
 		public int next(Pawn p) {
-			// FIXME: p.color may not be accessible if we refactor.
-			if (Color.lookupByColorName(p.color).equals(dimensionColor)) {
+			if (PawnWhisperer.color(p).equals(dimensionColor)) {
 				// Enter the home row.
 				return index + 1;
 			} else {
@@ -100,13 +101,13 @@ public class Board {
 	// Pawns on the board (coordinates).
 	HashMap<Pawn, Integer> pawnCoordinates = new HashMap<Pawn, Integer>();
 	// Assigned player colors.
-	HashMap<Integer, Color> playerColors = new HashMap<Integer, Color>();
+	HashMap<Integer, Color.Player> playerColors = new HashMap<Integer, Color.Player>();
 
 	public Board () throws IllegalStateException {
 		// TODO: Currently we assume there will be as many players as dimensions. There could be fewer.
 		// Assign each player a color.
 		for (int p = 0; p < dimensions; p++) {
-			Color playerColor = Color.forPlayer(p);
+			Color.Player playerColor = Color.forPlayer(p);
 
 			if (playerColor == null) {
 				throw new IllegalStateException(
@@ -148,13 +149,8 @@ public class Board {
 
 		// If a pawn has the same color as player and has a coordinate, add to pawnsNotInStart.
 		for (Pawn p : pawnCoordinates.keySet()) {
-			/* FIXME: p.color and p.id are only accessible here because by happy accident Board and Pawn
-			 * currently share the same package (parcheesi). They may not always if we do any refactoring
-			 * at all ever, and so we should make it possible to access p.color via another method. (See
-			 * PLAN.md for an idea.)
-			 */
-			if (Color.lookupByColorName(p.color).equals(playerColors.get(playerIndex))) {
-				pawnsNotInStart.add(p.id);
+			if (PawnWhisperer.color(p).equals(playerColors.get(playerIndex))) {
+				pawnsNotInStart.add(PawnWhisperer.id(p));
 			}
 		}
 
@@ -205,7 +201,7 @@ public class Board {
 			return false;
 		}
 
-		int playerIndex = Color.lookupByColorName(pawn.color).ordinal();
+		int playerIndex = PawnWhisperer.color(pawn).ordinal();
 		int playerEntryIndex = getPlayerEntryIndex(playerIndex);
 
 		setPawnCoordinate(pawn, playerEntryIndex);
@@ -214,8 +210,7 @@ public class Board {
 	}
 
 	public int pawnDistance(Pawn pawn) {
-		// FIXME: reference to p.color may not always work
-		int playerIndex  = Color.lookupByColorName(pawn.color).ordinal();
+		int playerIndex  = PawnWhisperer.color(pawn).ordinal();
 		int pawnStart    = getPlayerEntryIndex(playerIndex);
 		int pawnEnd      = getPawnCoordinate(pawn);
 		int distance = 0;
@@ -285,7 +280,7 @@ public class Board {
 			);
 
 			for (int i : newBoard.playerColors.keySet()) {
-				Color expected = Color.forPlayer(i);
+				Color.Player expected = Color.forPlayer(i);
 				String expectedName = expected.getColorName();
 				check(
 					newBoard.playerColors.get(i).equals(expected),
@@ -369,7 +364,7 @@ public class Board {
 			int iteration = 0;
 
 			int repetitions, start, expectedNext, nextIndex;
-			Color expectedColor;
+			Color.Player expectedColor;
 			Class expectedClass, expectedNextClass;
 			Location location, nextLocation;
 
@@ -399,7 +394,7 @@ public class Board {
 					// If we are on a Home space, we cannot actually have any expectedNext[Class].
 					if (location instanceof Home) {
 						// Either we should throw an Error if we try to go next() on our own Home...
-						if (location.dimensionColor.equals(Color.lookupByColorName(pawn.color))) {
+						if (location.dimensionColor.equals(PawnWhisperer.color(pawn))) {
 							boolean fail = false;
 							try {
 								location.next(pawn);
@@ -413,7 +408,7 @@ public class Board {
 
 					// And if we are on a different player's HomeRow, ...
 					if (location instanceof HomeRow) {
-						if (!location.dimensionColor.equals(Color.lookupByColorName(pawn.color))) {
+						if (!location.dimensionColor.equals(PawnWhisperer.color(pawn))) {
 							// The pawn can never reach this location.
 							continue;
 						}
@@ -436,7 +431,7 @@ public class Board {
 
 					// If this is a HomeEntry, and not our HomeEntry, ...
 					if (location instanceof HomeEntry
-							&& !location.dimensionColor.equals(Color.lookupByColorName(pawn.color))) {
+							&& !location.dimensionColor.equals(PawnWhisperer.color(pawn))) {
 						// We expect next to come after this player's HomeRow + Home.
 						expectedNext += (spacesPerRow - 1);
 						// And it should be of the class coming after HomeRow.class and Home.class in sequence.

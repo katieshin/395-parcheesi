@@ -1,6 +1,4 @@
-package parcheesi;
-
-import parcheesi.Color;
+package parcheesi.pawn;
 
 // NOTE: Do not change this interface!
 public class Pawn {
