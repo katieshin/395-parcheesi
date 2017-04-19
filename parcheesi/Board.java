@@ -267,7 +267,7 @@ public class Board {
 
 			check(
 				newBoard.locations.length == size,
-				"A Board should have Parameters.Board.size locations"
+				"A Board should have " + size + " locations"
 			);
 
 			boolean noNullLocations = true;
@@ -289,7 +289,7 @@ public class Board {
 				String expectedName = expected.getColorName();
 				check(
 					newBoard.playerColors.get(i).equals(expected),
-					"Player " + i + " is assigned the correct color for Player" + i + ", " + expectedName
+					"Player " + i + " is assigned the correct color: Player" + i + " ( " + expectedName + " )"
 				);
 			}
 
@@ -335,7 +335,7 @@ public class Board {
 
 			check(
 				countLocationsOfType(Neutral.class, newBoard) == size - numSafeSpaces,
-				"All remaining (non-safe) spaces should be Neutral"
+				"All remaining " + (size - numSafeSpaces) + " (non-safe) spaces should be Neutral"
 			);
 
 			// NOTE: counts is symmetric around HomeRow. That's neat.
