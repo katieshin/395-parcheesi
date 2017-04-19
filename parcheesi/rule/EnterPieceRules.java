@@ -4,7 +4,6 @@ import parcheesi.player.Player;
 import parcheesi.move.Move;
 import parcheesi.die.Die;
 import parcheesi.Board;
-import parcheesi.Pawn;
 
 import parcheesi.test.Tester;
 
@@ -64,7 +63,7 @@ public class EnterPieceRules implements Rule {
 			 */
 			// Setup for all tests.
 			Player player = new parcheesi.player.StubPlayer();
-			parcheesi.Pawn p = new parcheesi.Pawn(1, "blue");
+			parcheesi.pawn.Pawn p = new parcheesi.pawn.Pawn(1, "blue");
 
 			parcheesi.move.EnterPiece enterMove = new parcheesi.move.EnterPiece(p);
 			Move[] moves = new Move[] { enterMove };

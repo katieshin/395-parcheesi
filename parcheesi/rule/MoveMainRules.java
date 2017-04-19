@@ -66,7 +66,7 @@ public class MoveMainRules implements Rule {
 					// (2) The move taken is a DoublesPenalty move
 					if (onlyMove instanceof DoublesPenaltyMove) {
 						// (3) The DoublesPenaltyMove was enforced correctly
-						Pawn furthestPawn = before.furthestPawnOfPlayer(p);
+						parcheesi.pawn.Pawn furthestPawn = before.furthestPawnOfPlayer(p);
 						return before.removePawn(furthestPawn).equals(after);
 					}
 				}

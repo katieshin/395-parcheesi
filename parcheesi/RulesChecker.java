@@ -1,9 +1,8 @@
 package parcheesi;
 
-import parcheesi.Board;
 import parcheesi.move.Move;
-import parcheesi.test.Tester;
-import parcheesi.Pawn;
+import parcheesi.pawn.Pawn;
+import parcheesi.Board;
 
 class RulesChecker {
 	public static boolean validMove(Move move, Board board) {
@@ -19,9 +18,9 @@ class RulesChecker {
 		new RulesCheckerTester();
 	}
 
-	static class RulesCheckerTester extends Tester {
+	static class RulesCheckerTester extends parcheesi.test.Tester {
 		public RulesCheckerTester() {
-			Pawn p = new Pawn(5, "blue");
+			parcheesi.pawn.Pawn p = new parcheesi.pawn.Pawn(5, "blue");
 
 			check(
 				RulesChecker.validMove(new parcheesi.move.EnterPiece(p), new Board()),

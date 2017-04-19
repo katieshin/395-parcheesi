@@ -1,8 +1,6 @@
 package parcheesi.move;
 
-import parcheesi.die.Die;
-import parcheesi.Board;
-import parcheesi.Pawn;
+import parcheesi.pawn.Pawn;
 
 // represents a move that starts on the main ring
 // (but does not have to end up there)

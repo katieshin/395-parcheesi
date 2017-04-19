@@ -1,8 +1,6 @@
 package parcheesi.move;
 
-import parcheesi.die.Die;
-import parcheesi.Board;
-import parcheesi.Pawn;
+import parcheesi.pawn.Pawn;
 
 // represents a move that starts on one of the home rows
 public class MoveHome implements Move {
