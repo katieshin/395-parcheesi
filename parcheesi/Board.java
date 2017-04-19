@@ -100,18 +100,17 @@ public class Board {
 	// Pawns on the board (coordinates).
 	HashMap<Pawn, Integer> pawnCoordinates = new HashMap<Pawn, Integer>();
 	// Assigned player colors.
-	Player[] players = new Player[dimensions];
 	HashMap<Integer, Color> playerColors = new HashMap<Integer, Color>();
 
 	public Board () throws IllegalStateException {
 		// TODO: Currently we assume there will be as many players as dimensions. There could be fewer.
 		// Assign each player a color.
-		for (int p = 0; p < players.length; p++) {
+		for (int p = 0; p < dimensions; p++) {
 			Color playerColor = Color.forPlayer(p);
 
 			if (playerColor == null) {
 				throw new IllegalStateException(
-						"Cannot instantiate a Board with more Players than there are player colors."
+						"Cannot instantiate a Board with more dimensions than there are player colors."
 					);
 			}
 
