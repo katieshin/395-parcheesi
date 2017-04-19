@@ -1,11 +1,16 @@
 package parcheesi;
 
 class Parameters {
+	static final int maxPlayers = 4;
+
+	// Unlikely that we'll want to change this, but let's use a variable so that we can.
+	static final int pawnsPerPlayer = 4;
+
 	// Board layout/size parameters.
 	class Board {
 		// Corresponds to number of players that can exist on the board.
-		static final int dimensions = 4;
-		// NOTE: If a different dimension than 4 is chosen, renderer will need to be able to handle it.
+		static final int dimensions = maxPlayers;
+		// NOTE: If dimension changes, renderer will need to be able to handle it.
 
 		// Cannot be odd (our later calculations will break).
 		static final int spacesPerRow = 8;
@@ -40,7 +45,4 @@ class Parameters {
 		static final int entryIndexRelativeToDimensionStart = firstEntryIndex;
 		static final int spacesLeftAfterEntry = dimensionSize - entryIndexRelativeToDimensionStart;
 	}
-
-	// Unlikely that we'll want to change this, but let's use a variable so that we can.
-	static final int pawnsPerPlayer = 4;
 }
