@@ -303,33 +303,38 @@ public class Board {
 
 			check(
 				numEntries == dimensions,
-				"Every dimension should have 1 Entry"
+				"There are " + dimensions + " Entry locations"
 			);
 			check(
 				numHomeEntries == dimensions,
-				"Every dimension should have 1 HomeEntry"
+				"There are " + dimensions + " HomeEntry locations"
 			);
 			check(
 				numPlainSafeSpaces == dimensions,
-				"Every dimension should have 1 plain Safe"
+				"There are " + dimensions + " plain Safe locations"
 			);
 			check(
 				numHomeSpaces == dimensions,
-				"Every dimension should have 1 Home"
+				"There are " + dimensions + " Home locations"
 			);
+
+			int expectedNumHomeRowSpaces = dimensions * (spacesPerRow - 2);
 			check(
 				// spacesPerRow - 1 for Home, -1 for HomeEntry = spacesPerRow - 2
-				numHomeRowSpaces == dimensions * (spacesPerRow - 2),
-				"Every dimension should have " + (spacesPerRow - 2) + " HomeRow spaces"
+				numHomeRowSpaces == expectedNumHomeRowSpaces,
+				"There are " + expectedNumHomeRowSpaces + " HomeRow spaces"
 			);
+
+			int expectedNumSafeSpaces = dimensions * (4 + (spacesPerRow - 2));
 			check(
-				numSafeSpaces == dimensions * (4 + (spacesPerRow - 2)),
-				"Every dimension should have " + (4 + (spacesPerRow - 2)) + " Safe spaces:"
-				+ " 1 Entry, 1 HomeEntry, 1 plain Safe, 1 Home, " + (spacesPerRow - 2) + " HomeRow spaces"
+				numSafeSpaces == expectedNumSafeSpaces,
+				"There are " + expectedNumSafeSpaces + " Safe spaces:"
+				+ " " + dimensions + " Entry, HomeEntry, plain Safe, & Home,"
+				+ " " + expectedNumHomeRowSpaces + " HomeRow spaces"
 			);
+
 			check(
-				countLocationsOfType(Neutral.class, newBoard)
-					== size - numSafeSpaces,
+				countLocationsOfType(Neutral.class, newBoard) == size - numSafeSpaces,
 				"All remaining (non-safe) spaces should be Neutral"
 			);
 
@@ -368,7 +373,7 @@ public class Board {
 			Class expectedClass, expectedNextClass;
 			Location location, nextLocation;
 
-			// Choose pawn color such that pawn must travel starting as close to 0 as possible.
+			// Choosing this pawn color, pawn will enter Home on first iteration.
 			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
 
 			for (; traversed < size; iteration++) {
