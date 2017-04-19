@@ -1,20 +1,20 @@
 package parcheesi.player;
 
+import parcheesi.pawn.Pawn;
 import parcheesi.move.Move;
 import parcheesi.die.Die;
 import parcheesi.Board;
 import parcheesi.Color;
-import parcheesi.Pawn;
 
 public class SimplePlayer implements Player {
-	Color color;
+	Color.Player color;
 
 	// TODO?
 	// NOTE: Stub
 	public SimplePlayer () { }
 
 	public void startGame(String color) {
-		this.color = Color.lookupByColorName(color);
+		this.color = Color.Player.lookupByColorName(color);
 	}
 
 	public Move[] doMove(Board board, int[] dice) {
@@ -32,7 +32,7 @@ public class SimplePlayer implements Player {
 		return new Pawn(3, "blue");
 	}
 
-	public Color getColor() {
+	public Color.Player getColor() {
 		return color;
 	}
 }
