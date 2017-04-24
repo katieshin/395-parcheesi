@@ -589,10 +589,11 @@ public class Board {
 				"If the pawn has just entered the Board, its move distance is 0 moves"
 			);
 
-			int distanceToLastEntry = mainRingSizePerDimension * (dimensions - 1);
-			int maxPawnTravelDistance = distanceToLastEntry
+			int distanceToLastDimension = mainRingSizePerDimension * (dimensions - 1);
+			int maxPawnTravelDistance = distanceToLastDimension
 				+ spacesLeftAfterEntry
-				+ homeEntryIndexRelativeToDimensionStart;
+				+ homeEntryIndexRelativeToDimensionStart
+				+ (spacesPerRow + 1);
 
 			for (int i = 1; i < maxPawnTravelDistance; i++) {
 				board.movePawnForward(pawn, 1);
