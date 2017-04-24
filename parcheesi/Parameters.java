@@ -44,5 +44,12 @@ class Parameters {
 		static final int homeEntryIndexRelativeToDimensionStart = firstHomeEntryIndex;
 		static final int entryIndexRelativeToDimensionStart = firstEntryIndex;
 		static final int spacesLeftAfterEntry = dimensionSize - entryIndexRelativeToDimensionStart;
+
+		static final int pawnMainRingDistance = mainRingSizePerDimension * (dimensions - 1);
+		static final int maxPawnTravelDistance
+			= spacesLeftAfterEntry
+				+ pawnMainRingDistance
+				+ homeEntryIndexRelativeToDimensionStart
+				+ spacesPerRow; // NOTE: Home row all the way to Home.
 	}
 }

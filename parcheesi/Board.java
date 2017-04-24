@@ -2,6 +2,7 @@ package parcheesi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import static parcheesi.Parameters.Board.*;
 import static parcheesi.Parameters.pawnsPerPlayer;
@@ -201,10 +202,20 @@ public class Board {
 			return false;
 		}
 
-		int playerIndex = PawnWhisperer.color(pawn).ordinal();
+		int playerIndex = PawnWhisperer.playerIndex(pawn);
 		int playerEntryIndex = getPlayerEntryIndex(playerIndex);
 
 		setPawnCoordinate(pawn, playerEntryIndex);
+
+		return true;
+	}
+
+	public boolean removePawn(Pawn pawn) {
+		if (!pawnCoordinates.containsKey(pawn)) {
+			return false;
+		}
+
+		pawnCoordinates.remove(pawn);
 
 		return true;
 	}
@@ -241,6 +252,7 @@ public class Board {
 			boardGeneration();
 			getPlayerEntryIndex();
 			addPawn();
+			removePawn();
 			playerPawnIndicesInStart();
 			movePawnForward();
 			pawnDistance();
@@ -504,6 +516,36 @@ public class Board {
 			);
 		}
 
+	static final int removePawnIterations = 10;
+	void removePawn() {
+		Board board = new Board();
+		Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
+
+		check(
+			!board.removePawn(pawn),
+			"Removing a pawn not on the board fails"
+		);
+
+		boolean addSuccess = board.addPawn(pawn);
+		check(
+			addSuccess && board.removePawn(pawn),
+			"Removing a pawn immediately after adding it succeeds"
+		);
+
+		Random rand = new Random();
+
+		for (int i = 0; i < removePawnIterations; i++) {
+			addSuccess = board.addPawn(pawn);
+			int moveDistance = rand.nextInt(maxPawnTravelDistance - 1) + 1; // NOTE: Always move >= 1 spc.
+			boolean moveSuccess = board.movePawnForward(pawn, moveDistance);
+
+			check(
+				addSuccess && moveSuccess && board.removePawn(pawn),
+				"RANDOM TEST: A pawn can be removed from position " + (1 + moveDistance) + " on the board"
+			);
+		}
+	}
+
 		void playerPawnIndicesInStart() {
 			Board board = new Board();
 
@@ -588,12 +630,6 @@ public class Board {
 				board.addPawn(pawn) && board.pawnDistance(pawn) == 0,
 				"If the pawn has just entered the Board, its move distance is 0 moves"
 			);
-
-			int distanceToLastDimension = mainRingSizePerDimension * (dimensions - 1);
-			int maxPawnTravelDistance = distanceToLastDimension
-				+ spacesLeftAfterEntry
-				+ homeEntryIndexRelativeToDimensionStart
-				+ spacesPerRow;
 
 			/* NOTE: purposefully travel 1 space past the maxPawnTravelDistance to test that distance
 			 * doesn't go up when you try to move past Home.
