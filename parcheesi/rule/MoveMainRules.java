@@ -46,6 +46,7 @@ public class MoveMainRules implements Rule {
 	}
 
 	static class MustGiveDoublesPenalty implements Rule {
+		// NOTE: the boards passed into enforce are copies and can therefore be mutated without effect.
 		public boolean enforce(Die[] dice, Player p, Board before, Move[] moves, Board after) {
 			// FIXME Game is not implemented yet.
 			// if in the most recent turn, it was the 2nd DoublesBonusTurn and doubles were rolled:
@@ -66,8 +67,22 @@ public class MoveMainRules implements Rule {
 					// (2) The move taken is a DoublesPenalty move
 					if (onlyMove instanceof DoublesPenaltyMove) {
 						// (3) The DoublesPenaltyMove was enforced correctly
-						parcheesi.pawn.Pawn furthestPawn = before.furthestPawnOfPlayer(p);
-						return before.removePawn(furthestPawn).equals(after);
+						// (a) Get all Player Pawns
+						Pawn[] playerPawns = Game.getPlayerPawns(p);
+
+						// (b) Find out which pawn was furthest
+						Pawn furthestPawn;
+						int furthestPawnDistance = -1;
+						for (Pawn p : playerPawns) {
+							int distance = before.pawnDistance(p);
+							if (distance > furthestPawnDistance) {
+								furthestPawnDistance = distance;
+								furthestPawn = p;
+							}
+						}
+
+						// (c) Remove the furthest pawn and make sure that's the same as the resulting board
+						return before.removePawn(furthestPawn) && before.equals(after);
 					}
 				}
 			}
