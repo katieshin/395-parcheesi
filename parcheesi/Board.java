@@ -593,13 +593,21 @@ public class Board {
 			int maxPawnTravelDistance = distanceToLastDimension
 				+ spacesLeftAfterEntry
 				+ homeEntryIndexRelativeToDimensionStart
-				+ (spacesPerRow + 1);
+				+ spacesPerRow;
 
-			for (int i = 1; i < maxPawnTravelDistance; i++) {
-				board.movePawnForward(pawn, 1);
+			/* NOTE: purposefully travel 1 space past the maxPawnTravelDistance to test that distance
+			 * doesn't go up when you try to move past Home.
+			 */
+			for (int i = 1; i < maxPawnTravelDistance + 1; i++) {
+				boolean moveSuccess = board.movePawnForward(pawn, 1);
+				int distance = board.pawnDistance(pawn);
 				check(
-					board.pawnDistance(pawn) == i,
-					"If the pawn is moved " + i + " spaces, its distance is " + i
+					// Went off the board:
+					!moveSuccess && distance == (i - 1)
+						// Still on the board:
+						|| distance == i,
+					"If the pawn is moved " + i + " spaces, its distance is "
+					+ (moveSuccess ? i : "still " + (i - 1))
 				);
 			}
 		}
