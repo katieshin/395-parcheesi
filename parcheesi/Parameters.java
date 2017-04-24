@@ -16,6 +16,7 @@ class Parameters {
 		static final int spacesPerRow = 8;
 
 		// Must be odd (in order to have a middle row for the home row).
+		// FIXME: Cannot actually adjust this value because *pattern* tests don't account for it.
 		static final int rowsPerDimension = 3;
 
 		/* Corresponds to the distance between two nodes of alike type and same relative
@@ -50,6 +51,6 @@ class Parameters {
 			= spacesLeftAfterEntry
 				+ pawnMainRingDistance
 				+ homeEntryIndexRelativeToDimensionStart
-				+ spacesPerRow; // NOTE: Home row all the way to Home.
+				+ spacesPerRow; // NOTE: All other terms are obvious; this is Home Row thru to Home.
 	}
 }
