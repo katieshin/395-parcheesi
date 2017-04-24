@@ -2,7 +2,6 @@ package parcheesi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import static parcheesi.Parameters.Board.*;
 import static parcheesi.Parameters.pawnsPerPlayer;
@@ -532,7 +531,7 @@ public class Board {
 			"Removing a pawn immediately after adding it succeeds"
 		);
 
-		Random rand = new Random();
+		java.util.Random rand = new java.util.Random();
 
 		for (int i = 0; i < removePawnIterations; i++) {
 			addSuccess = board.addPawn(pawn);
