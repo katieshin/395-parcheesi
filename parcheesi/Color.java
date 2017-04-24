@@ -60,17 +60,5 @@ public class Color {
 	public static Color.Player forPlayer(int i) {
 		return Color.Player.valueOf("Player" + (i + 1));
 	}
-
-	public static ColorEnum lookupByColorName(String name) {
-		for (ColorEnum c: Player.values()) {
-			if (c.getColorName().equals(name)) return c;
-		}
-
-		for (ColorEnum c: Space.values()) {
-			if (c.getColorName().equals(name)) return c;
-		}
-
-		return null;
-	}
 }
 
