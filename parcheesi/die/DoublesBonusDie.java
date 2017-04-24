@@ -12,24 +12,14 @@ public class DoublesBonusDie extends NormalDie {
 	 * NormalDie).
 	 */
 	public static void main(String[] args)
-		throws	InstantiationException,
-				NoSuchMethodException,
-				IllegalAccessException,
-				InvocationTargetException,
-				// ^^^ Reflection Exceptions. Yup.
-				Die.InvalidDieException {
+		throws Die.InvalidDieException {
 		// NOTE: MUST pass in a die with value 4. (Assumption made by tester.)
 		new DoublesBonusDieTester(new DoublesBonusDie(4));
 	}
 
 	static class DoublesBonusDieTester extends NormalDie.NormalDieTester<DoublesBonusDie> {
 		public DoublesBonusDieTester(DoublesBonusDie validDbd)
-			throws	InstantiationException,
-					NoSuchMethodException,
-					IllegalAccessException,
-					InvocationTargetException,
-					// ^^^ Reflection Exceptions. Yup.
-					Die.InvalidDieException {
+			throws Die.InvalidDieException {
 			super(validDbd);
 		}
 	}
