@@ -213,7 +213,7 @@ public class Board {
 		int playerIndex  = PawnWhisperer.color(pawn).ordinal();
 		int pawnStart    = getPlayerEntryIndex(playerIndex);
 		int pawnEnd      = getPawnCoordinate(pawn);
-		int distance = 0;
+		int distance     = 0;
 
 		// If you're not on the board or you're on entry, then distance is 0.
 		if (pawnEnd == -1 || pawnEnd == pawnStart) {
