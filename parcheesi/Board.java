@@ -2,6 +2,8 @@ package parcheesi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 import static parcheesi.Parameters.Board.*;
 import static parcheesi.Parameters.pawnsPerPlayer;
@@ -144,6 +146,29 @@ public class Board {
 		}
 	}
 
+	public Board (Board b) {
+		locations = b.locations;
+		playerColors = b.playerColors;
+		for (Pawn p : b.pawnCoordinates.keySet()) {
+			pawnCoordinates.put(p, b.pawnCoordinates.get(p));
+		}
+	}
+
+	public boolean equals (Board other) {
+		boolean equal = true;
+
+		// NOTE: A Set of all pawns in either board
+		Set<Pawn> pawns = new HashSet<Pawn>(pawnCoordinates.keySet());
+		pawns.addAll(other.pawnCoordinates.keySet());
+
+		for (Pawn p : pawns) {
+			int otherCoord = other.getPawnCoordinate(p);
+			equal &= (otherCoord == this.getPawnCoordinate(p));
+		}
+
+		return equal;
+	}
+
 	public ArrayList<Integer> getPlayerPawnIndicesInStart(int playerIndex) {
 		ArrayList<Integer> pawnsNotInStart = new ArrayList<Integer>();
 
@@ -255,6 +280,7 @@ public class Board {
 			playerPawnIndicesInStart();
 			movePawnForward();
 			pawnDistance();
+			boardEquality();
 
 			summarize();
 		}
@@ -467,6 +493,63 @@ public class Board {
 			}
 
 			check(orderIsCorrect, "Patterns in the board repeat as expected");
+		}
+
+		void boardEquality() {
+			Board b = new Board();
+			Board copy = new Board(b);
+			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
+			Pawn pawnCopy = new Pawn(0, Color.forPlayer(0).getColorName());
+
+			check(
+				b.equals(copy) && copy.equals(b),
+				"An empty board and its copy are equal to one another"
+			);
+
+			copy.addPawn(pawn);
+			check(
+				!(b.equals(copy) || copy.equals(b)),
+				"Boards with different numbers of pawns should not be equal"
+			);
+
+			b.addPawn(pawnCopy);
+			check(
+				!(b.equals(copy) || copy.equals(b)),
+				"Boards with different instances of the same pawn with the same"
+				+ " coordinate should not be equal"
+			);
+
+			b.removePawn(pawnCopy);
+			b.addPawn(pawn);
+			check(
+				b.equals(copy) && copy.equals(b),
+				"Boards with the same pawn in the same coordinate should be equal"
+			);
+
+			copy.movePawnForward(pawn, 1);
+			check(
+				!(b.equals(copy) || copy.equals(b)),
+				"Boards with the same pawn in different coordinates should not be equal"
+			);
+
+			Pawn pawn2 = new Pawn(1, Color.forPlayer(0).getColorName());
+			copy.addPawn(pawn2);
+			check(
+				!(b.equals(copy) || copy.equals(b)),
+				"Boards with different pawns should not be equal"
+			);
+
+			b.addPawn(pawn2);
+			check(
+				!(b.equals(copy) || copy.equals(b)),
+				"Boards with the same pawns but not the same coordinates should not be equal"
+			);
+
+			b.movePawnForward(pawn, 1);
+			check(
+				b.equals(copy) && copy.equals(b),
+				"Boards with the same pawns in the same coordinates should be equal"
+			);
 		}
 
 		void getPlayerEntryIndex() {
