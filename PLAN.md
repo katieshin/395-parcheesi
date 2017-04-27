@@ -15,16 +15,9 @@ answered.
 
 ## Cruft (Stuff to clean up)
 
-- ~~SmartMove is dumb and we're getting rid of it~~
-- ~~Pawn.getColor doesn't belong there~~
-- ~~Player should not own doubles count~~
-- ~~Player should not know which pawn is furthest on Board~~
 - Make sure code is organized top-down (Helpers after helped methods)
-- ~~How will we calculate pawn distance from Entry accurately? (Aren't doing this yet)~~
 - ~~Board should not own performMove()~~
   - TranslatedMoves have a method called apply()
-- ~~Move constants in Board to Parameters.java (or some other config file)~~
-- ~~Use try/catch to clean up `throws` spew in NormalDieTester and DoublesBonusDie~~
 
 ## Handling Doubles Penalty
 
