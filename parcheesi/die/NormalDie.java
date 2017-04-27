@@ -1,8 +1,5 @@
 package parcheesi.die;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 public class NormalDie extends Die {
 	public NormalDie(int value) throws InvalidDieException {
 		if (value >= 1 && value <= 6) {
@@ -15,15 +12,13 @@ public class NormalDie extends Die {
 	}
 
 	// What follows is... slightly unsightly. You have been warned.
-	public static void main(String[] args)
-		throws Die.InvalidDieException {
+	public static void main(String[] args) throws Die.InvalidDieException {
 		// NOTE: MUST pass in a die with value 4. (Assumption made by tester.)
 		new NormalDieTester<NormalDie>(new NormalDie(4));
 	}
 
 	protected static class NormalDieTester<T extends NormalDie> extends parcheesi.test.Tester {
-		public NormalDieTester (T valid)
-			throws Die.InvalidDieException {
+		public NormalDieTester (T valid) throws Die.InvalidDieException {
 			String dieTypeName = valid.getClass().getSimpleName();
 
 			check(
@@ -33,7 +28,8 @@ public class NormalDie extends Die {
 
 			// Get the constructor for this type that takes 1 int as its only argument.
 			try {
-				Constructor<? extends NormalDie> ctor = valid.getClass().getConstructor(int.class);
+				java.lang.reflect.Constructor<? extends NormalDie> ctor
+					= valid.getClass().getConstructor(int.class);
 
 				boolean ltInvalid = false;
 				try {
