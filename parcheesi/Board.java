@@ -100,6 +100,7 @@ public class Board {
 
 	// Board spaces/locations.
 	Location[] locations = new Location[size];
+	// TODO:? Public locations mirror using Collections.unmodifiableList?
 	// Pawns on the board (coordinates).
 	HashMap<Pawn, Integer> pawnCoordinates = new HashMap<Pawn, Integer>();
 	// Assigned player colors.
