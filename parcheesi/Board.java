@@ -2,8 +2,8 @@ package parcheesi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 import static parcheesi.Parameters.Board.*;
 import static parcheesi.Parameters.pawnsPerPlayer;
@@ -106,7 +106,7 @@ public class Board {
 	// Assigned player colors.
 	HashMap<Integer, Color.Player> playerColors = new HashMap<Integer, Color.Player>();
 
-	public Board () throws IllegalStateException {
+	public Board() throws IllegalStateException {
 		// TODO: Currently we assume there will be as many players as dimensions. There could be fewer.
 		// Assign each player a color.
 		for (int p = 0; p < dimensions; p++) {
@@ -114,8 +114,8 @@ public class Board {
 
 			if (playerColor == null) {
 				throw new IllegalStateException(
-						"Cannot instantiate a Board with more dimensions than there are player colors."
-					);
+					"Cannot instantiate a Board with more dimensions than there are player colors."
+				);
 			}
 
 			playerColors.put(p, playerColor);
@@ -137,17 +137,17 @@ public class Board {
 				}
 				// Insert Home.
 				locations[i] = new Home(i);
-			// Entry.
+				// Entry.
 			} else if ((i - firstEntryIndex) % dimensionSize == 0) {
 				locations[i] = new Entry(i);
-			// o/w: Neutral.
+				// o/w: Neutral.
 			} else {
 				locations[i] = new Neutral(i);
 			}
 		}
 	}
 
-	public Board (Board b) {
+	public Board(Board b) {
 		locations = b.locations;
 		playerColors = b.playerColors;
 		for (Pawn p : b.pawnCoordinates.keySet()) {
@@ -155,7 +155,7 @@ public class Board {
 		}
 	}
 
-	public boolean equals (Board other) {
+	public boolean equals(Board other) {
 		boolean equal = true;
 
 		// NOTE: A Set of all pawns in either board
@@ -286,7 +286,7 @@ public class Board {
 			summarize();
 		}
 
-		int countLocationsOfType (Class classObject, Board b) {
+		int countLocationsOfType(Class classObject, Board b) {
 			int count = 0;
 			for (int i = 0; i < size; i++) {
 				// System.out.println(i + " " + b.locations[i].getClass().getSimpleName());
