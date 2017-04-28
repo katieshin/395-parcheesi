@@ -5,13 +5,10 @@ public class NormalDie extends Die {
 		if (value >= 1 && value <= 6) {
 			this.value = value;
 		} else {
-			// NOTE: Game will implode if invalid die roll is passed to constructor.
-			// FIXME: May not be the best UX?
 			throw new Die.InvalidDieException(value);
 		}
 	}
 
-	// What follows is... slightly unsightly. You have been warned.
 	public static void main(String[] args) throws Die.InvalidDieException {
 		// NOTE: MUST pass in a die with value 4. (Assumption made by tester.)
 		new NormalDieTester<NormalDie>(new NormalDie(4));
