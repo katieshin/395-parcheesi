@@ -13,11 +13,13 @@ RulesChecker
 Not all of the questions that need to be answered in order to write MoveMainRules have been
 answered.
 
-## Cruft (Stuff to clean up)
+## Handling the Special Case of EnterPiece
 
-- Make sure code is organized top-down (Helpers after helped methods)
-- ~~Board should not own performMove()~~
-  - TranslatedMoves have a method called apply()
+An EnterPiece move can actually consume 2 dice (if they sum to 5).
+
+So let's define a Pair of Die that can be passed into EnterPiece instead of a single Die. That way
+we handle the special case without having to resort to trying out every combination of dice possible
+for every possible move during move generation.
 
 ## Handling Doubles Penalty
 
@@ -30,25 +32,6 @@ answered.
   available to you, or you incurred a DoublesPenalty and that is your only move), and the player
   should still be presented with some message, and then the Turn should be applied and the rules
   checked.
-
-# Board Interface (Need this)
-
-1. ~~movePawnForward~~
-2. ~~removePawn~~
-
-	// !!Doesn't belong here!!
-	// Location loc = before.getPawnLocation(pawn);
-	// before.setPawnCoordinate(pawn, loc.next(pawn));
-	MoveMain.apply(Board board) {
-		board.movePawn(this.pawn, this.die);
-	}
-
-	Board.movePawnForward(Pawn pawn, int count) {
-		for (int i = 0; i < count; i++) {
-			Location loc = getPawnLocation(pawn);
-			setPawnCoordinate(pawn, loc.next(pawn));
-		}
-	}
 
 ## New stuff to make way for
 
