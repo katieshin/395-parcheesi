@@ -18,7 +18,7 @@ public class EnterPieceRules implements Rule {
 
 		// NOTE: Singleton.
 		public ADieIsFive () { }
-		public static ADieIsFive instance = new ADieIsFive();
+		public static ADieIsFive rule = new ADieIsFive();
 	}
 
 	static class DiceSumToFive implements Rule {
@@ -32,25 +32,18 @@ public class EnterPieceRules implements Rule {
 
 		// NOTE: Singleton.
 		public DiceSumToFive () { }
-		public static DiceSumToFive instance = new DiceSumToFive();
+		public static DiceSumToFive rule = new DiceSumToFive();
 	}
 
 	// NOTE: Either/or relationship.
 	public boolean enforce(Die[] dice, Player player, Board before, Move[] moves, Board after) {
-		boolean anyMoveIsEnterPiece = false;
-		for (Move m : moves) {
-			anyMoveIsEnterPiece |= (m instanceof parcheesi.move.EnterPiece);
-		}
-
-		if (!anyMoveIsEnterPiece) return true; // No need to apply these rules.
-
-		return ADieIsFive.instance.enforce(dice, player, before, moves, after)
-			|| DiceSumToFive.instance.enforce(dice, player, before, moves, after);
+		return ADieIsFive.rule.enforce(dice, player, before, moves, after)
+			|| DiceSumToFive.rule.enforce(dice, player, before, moves, after);
 	}
 
 	// NOTE: Singleton.
 	public EnterPieceRules () { }
-	public static EnterPieceRules instance = new EnterPieceRules();
+	public static rule = new EnterPieceRules();
 
 	public static void main (String[] args) throws Die.InvalidDieException {
 		new EnterPieceTester();
@@ -73,7 +66,7 @@ public class EnterPieceRules implements Rule {
 			};
 
 			check(
-				ADieIsFive.instance.enforce(dice, player, new Board(), moves, new Board()),
+				ADieIsFive.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"ADieIsFive success check."
 			);
 
@@ -82,12 +75,12 @@ public class EnterPieceRules implements Rule {
 				new parcheesi.die.NormalDie(1)
 			};
 			check(
-				!ADieIsFive.instance.enforce(dice, player, new Board(), moves, new Board()),
+				!ADieIsFive.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"ADieIsFive fail check."
 			);
 
 			check(
-				DiceSumToFive.instance.enforce(dice, player, new Board(), moves, new Board()),
+				DiceSumToFive.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"DiceSumToFive success check."
 			);
 
@@ -96,7 +89,7 @@ public class EnterPieceRules implements Rule {
 				new parcheesi.die.NormalDie(4)
 			};
 			check(
-				!DiceSumToFive.instance.enforce(dice, player, new Board(), moves, new Board()),
+				!DiceSumToFive.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"DiceSumToFive fail check."
 			);
 
@@ -106,7 +99,7 @@ public class EnterPieceRules implements Rule {
 				new parcheesi.die.NormalDie(1)
 			};
 			check(
-				EnterPieceRules.instance.enforce(dice, player, new Board(), moves, new Board()),
+				EnterPieceRules.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"Integration test: Dice sum to 5 is valid for EnterPiece."
 			);
 
@@ -115,7 +108,7 @@ public class EnterPieceRules implements Rule {
 				new parcheesi.die.NormalDie(1)
 			};
 			check(
-				EnterPieceRules.instance.enforce(dice, player, new Board(), moves, new Board()),
+				EnterPieceRules.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"Integration test: Any die is 5 is valid for EnterPiece."
 			);
 
@@ -124,7 +117,7 @@ public class EnterPieceRules implements Rule {
 				new parcheesi.die.NormalDie(1)
 			};
 			check(
-				!EnterPieceRules.instance.enforce(dice, player, new Board(), moves, new Board()),
+				!EnterPieceRules.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"Integration test: Dice where neither die is 5 and sum is not 5 are invalid for"
 				+ " EnterPiece."
 			);
@@ -132,7 +125,7 @@ public class EnterPieceRules implements Rule {
 			parcheesi.move.MoveMain move4 = new parcheesi.move.MoveMain(p, 0, 4);
 			moves = new Move[] { move4 };
 			check(
-				EnterPieceRules.instance.enforce(dice, player, new Board(), moves, new Board()),
+				EnterPieceRules.rule.enforce(dice, player, new Board(), moves, new Board()),
 				"Integration test: if no move is an EnterPiece move, then bypass tests."
 				/* (That is to say, if no rule in this rule set applies, assume that this rule set
 				 *  is satisfied because none of its rules can possibly be broken -- they don't
