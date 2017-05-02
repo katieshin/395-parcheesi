@@ -268,6 +268,22 @@ public class Board {
 		return distance;
 	}
 
+	public List<Pawn> getPawnsAtCoordinate(int coord) {
+		/* NOTE: this ArrayList will need to be resized if the board is currently invalid but that's
+		 * okay. We will catch an error, if there is one, when we run the RulesChecker.
+		 */
+		List<Pawn> pawns = new ArrayList<Pawn>(parcheesi.Parameters.Board.maximumPawnOccupancy);
+
+		for (Map.Entry<Pawn, Integer> coordinate : pawnCoordinates.entrySet()) {
+			if (coordinate.getValue().equals(coord)) {
+				// This pawn is in our location with us.
+				pawns.add(coordinate.getKey());
+			}
+		}
+
+		return pawns;
+	}
+
 	public static void main(String[] args) throws UnsupportedOperationException {
 		new BoardTester();
 	}
@@ -729,6 +745,70 @@ public class Board {
 					+ (moveSuccess ? i : "still " + (i - 1))
 				);
 			}
+		}
+
+		void getPawnsAtCoordinate() {
+			Board board = new Board();
+			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
+			int coord = board.getPlayerEntryIndex(0);
+			List<Pawn> pawns = board.getPawnsAtCoordinate(coord);
+
+			// Board is initially empty.
+			boolean wholeBoardIsEmpty = true;
+			for (Location location : board.locations) {
+				pawns = board.getPawnsAtCoordinate(location.index);
+				wholeBoardIsEmpty &= pawns.isEmpty();
+			}
+
+			check(
+				wholeBoardIsEmpty,
+				"Every board location should be empty on a new board"
+			);
+
+			// A single pawn enters the board.
+			board.addPawn(pawn);
+			coord = board.getPawnCoordinate(pawn);
+			pawns = board.getPawnsAtCoordinate(coord);
+
+			check(
+				pawns.size() == 1 && pawns.contains(pawn),
+				"After adding a pawn to the board, there should be one pawn at that pawn coordinate"
+			);
+
+			// A different color pawn enters the board.
+			Pawn otherPlayerPawn = new Pawn(0, Color.forPlayer(1).getColorName());
+			board.addPawn(otherPlayerPawn);
+
+			int otherPlayerCoord = board.getPlayerEntryIndex(1);
+			List<Pawn> otherPlayerPawns = board.getPawnsAtCoordinate(otherPlayerCoord);
+			
+			check(
+				otherPlayerPawns.size() == 1 && otherPlayerPawns.contains(otherPlayerPawn),
+				"After adding a pawn of a different color to the board, there should be one pawn at that"
+				+ " pawn coordinate"
+			);
+
+			// A second pawn of the original color enters the board.
+			Pawn sameColorPawn = new Pawn(1, Color.forPlayer(0).getColorName());
+			board.addPawn(sameColorPawn);
+			pawns = board.getPawnsAtCoordinate(coord);
+
+			check(
+				pawns.size() == 2 && pawns.contains(pawn) && pawns.contains(sameColorPawn),
+				"After adding a new pawn of the same color, there are two pawns at that pawn coordinate"
+			);
+
+			// Move both the pawns of the original color to a different location.
+			board.movePawnForward(pawn, 3);
+			board.movePawnForward(sameColorPawn, 3);
+			coord = board.getPawnCoordinate(pawn);
+			pawns = board.getPawnsAtCoordinate(coord);
+
+			check(
+				pawns.size() == 2 && pawns.contains(pawn) && pawns.contains(sameColorPawn),
+				"After moving two pawns of the same color separately to the same location, there are still"
+				+ " two pawns at that new pawn coordinate"
+			);
 		}
 	}
 }
