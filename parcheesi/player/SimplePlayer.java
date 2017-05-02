@@ -7,8 +7,6 @@ import parcheesi.Board;
 import parcheesi.Color;
 
 public class SimplePlayer implements Player {
-	Color.Player color;
-
 	// TODO?
 	// NOTE: Stub
 	public SimplePlayer () { }
@@ -25,14 +23,5 @@ public class SimplePlayer implements Player {
 	public void DoublesPenalty() {
 		// TODO
 		// getFurthestPawn().restart();
-	}
-
-	public Pawn getFurthestPawn() {
-		// TODO
-		return new Pawn(3, "blue");
-	}
-
-	public Color.Player getColor() {
-		return color;
 	}
 }
