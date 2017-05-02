@@ -5,12 +5,15 @@ import parcheesi.pawn.Pawn;
 import parcheesi.Board;
 
 class RulesChecker {
-	public static boolean validMove(Move move, Board board) {
+	public static boolean validTurn(Turn turn, Board board) {
 		/* For each type of move, determine whether move is valid given board.
 		 *	 - EnterPiece
 		 *	 - MoveMain
 		 *	 - MoveHome
 		 */
+		Board after = new Board(board);
+		turn.apply(after);
+		// TODO: How do we determine which rules apply to this turn so we know what to check?
 		return true;
 	}
 
