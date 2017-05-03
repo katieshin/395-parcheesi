@@ -3,7 +3,9 @@ package parcheesi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Map;
 
 import static parcheesi.Parameters.Board.*;
 import static parcheesi.Parameters.pawnsPerPlayer;
@@ -298,6 +300,7 @@ public class Board {
 			movePawnForward();
 			pawnDistance();
 			boardEquality();
+			getPawnsAtCoordinate();
 
 			summarize();
 		}
@@ -781,9 +784,10 @@ public class Board {
 
 			int otherPlayerCoord = board.getPlayerEntryIndex(1);
 			List<Pawn> otherPlayerPawns = board.getPawnsAtCoordinate(otherPlayerCoord);
-			
+
 			check(
-				otherPlayerPawns.size() == 1 && otherPlayerPawns.contains(otherPlayerPawn),
+				otherPlayerPawns.size() == 1 && otherPlayerPawns.contains(otherPlayerPawn)
+				&& pawns.size() == 1 && pawns.contains(pawn),
 				"After adding a pawn of a different color to the board, there should be one pawn at that"
 				+ " pawn coordinate"
 			);

@@ -12,6 +12,9 @@ public class Parameters {
 		public static final int dimensions = maxPlayers;
 		// NOTE: If dimension changes, renderer will need to be able to handle it.
 
+		// How many pawns can share a single location?
+		public static final int maximumPawnOccupancy = 2;
+
 		// Cannot be odd (our later calculations will break).
 		public static final int spacesPerRow = 8;
 
