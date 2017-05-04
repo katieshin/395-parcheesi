@@ -210,6 +210,11 @@ public class Board {
 
 	public boolean movePawnForward(Pawn pawn, int spaces) {
 		int currentCoordinate = getPawnCoordinate(pawn);
+
+		if (currentCoordinate == -1) {
+			return false;
+		}
+
 		Location currentLocation = locations[currentCoordinate];
 
 		for (int i = 0; i < spaces; i++) {
