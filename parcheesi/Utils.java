@@ -29,4 +29,26 @@ public class Utils {
 
 		return result;
 	}
+
+	/**
+	 * Translates a PascalCased string into kebab-case.
+	 *
+	 * @param s String to convert to kebab-case
+	 *
+	 * @return Kebab-cased string
+	 */
+	public static String dashify(String s) {
+		String result = "";
+		char[] chars = s.toCharArray();
+
+		for (int i = 0; i < chars.length; i++) {
+			char c = chars[i];
+			if (Character.isUpperCase(c) && i != 0) {
+				result += "-";
+			}
+			result += Character.toLowerCase(c);
+		}
+
+		return result;
+	}
 }
