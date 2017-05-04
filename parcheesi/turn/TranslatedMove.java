@@ -3,7 +3,7 @@ package parcheesi.turn;
 import java.util.ArrayList;
 import java.util.List;
 
-import parcheesi.move.action.MoveAction;
+import parcheesi.move.action.Action;
 import parcheesi.move.Move;
 import parcheesi.pawn.Pawn;
 import parcheesi.die.Die;
@@ -12,7 +12,7 @@ import parcheesi.Board;
 class TranslatedMove {
 
 	Class<? extends Move> MoveClass;
-	List<MoveAction> actions;
+	List<Action> actions;
 
 	/**
 	 * Create the complete move encapsulating all of the Actions taken by some Pawn on some Board
@@ -24,7 +24,7 @@ class TranslatedMove {
 	 */
 	public TranslatedMove(Die die, Pawn pawn, Board board) {
 		MoveClass = getMoveClass(dice, pawn, board);
-		modifiers = getApplicableActions(MoveClass, die, pawn, board);
+		actions   = getApplicableActions(MoveClass, die, pawn, board);
 	}
 
 	/**
@@ -37,7 +37,7 @@ class TranslatedMove {
 	public Board take(Board board) {
 		Board result = new Board(board);
 
-		for (MoveAction action : actions) {
+		for (Action action : actions) {
 			action.take(result);
 		}
 
@@ -67,12 +67,13 @@ class TranslatedMove {
 	}
 
 	// Assuming a Move is feasible, what modifiers apply to the Move?
-	private List<MoveAction> getApplicableActions(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
-		List<MoveAction> applicableActions = new ArrayList<MoveAction>();
+	private List<Action> getApplicableActions(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
+		List<Action> applicableActions = new ArrayList<Action>();
 
-		for (MoveAction action : MoveAction.ACTIONS) {
-			if (action.isApplicable(MoveClass, die, pawn, board)) {
-				applicableActions.add(action);
+		// FIXME: the terminology here is kinda fucked up, but it works well enough.
+		for (Action actionType : Action.ACTIONS) {
+			if (actionType.action.isApplicable(MoveClass, die, pawn, board)) {
+				applicableActions.add(actionType.action);
 			}
 		}
 
