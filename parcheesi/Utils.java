@@ -6,7 +6,7 @@ public class Utils {
 	 *
 	 * @param num The integer to convert to float
 	 *
-	 * @return float
+	 * @return Float value
 	 */
 	public static float int2float(int num) {
 		return (new Integer(num)).floatValue();
@@ -18,7 +18,7 @@ public class Utils {
 	 * @param times The number of times to repeat the string
 	 * @param s The string to repeat
 	 *
-	 * @return String
+	 * @return Repeated string
 	 */
 	public static String repeatString(int times, String s) {
 		String result = "";
