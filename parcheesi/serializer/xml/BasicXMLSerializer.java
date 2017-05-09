@@ -35,7 +35,7 @@ public class BasicXMLSerializer implements Serializer {
 		return Dice().child(
 			Arrays.asList(dice)
 				.stream()
-				.map(d -> Die().child(d.getValue()))
+				.map(dieToDieNode)
 				.toArray(Node[]::new)
 		);
 	}
@@ -46,40 +46,123 @@ public class BasicXMLSerializer implements Serializer {
 
 	private static class BasicXMLSerializerTester extends parcheesi.test.Tester {
 		BasicXMLSerializerTester() throws Die.InvalidDieException {
-			Board board = new Board();
-
 			Serializer serializer = new BasicXMLSerializer();
 
+			Board board = new Board();
 			String color = parcheesi.Color.forPlayer(0).getColorName();
+			Pawn pawn1 = new Pawn(0, color);
+			Pawn pawn2 = new Pawn(1, color);
+			Pawn pawn3 = new Pawn(2, color);
+			Pawn pawn4 = new Pawn(3, color);
 
-			Pawn pawn = new Pawn(0, color);
+			Pawn[] pawns = { pawn1, pawn2, pawn3, pawn4 };
 
-			Pawn[] pawns = {
-				pawn,
-				new Pawn(1, color),
-				new Pawn(2, color),
-				new Pawn(3, color)
-			};
+			check(
+				serializer.serialize(pawns, board).toString().equals(
+					Board().child(
+						Start().child(
+							pawnToPawnNode.apply(pawn1, board),
+							pawnToPawnNode.apply(pawn2, board),
+							pawnToPawnNode.apply(pawn3, board),
+							pawnToPawnNode.apply(pawn4, board)
+						),
+						Main().child(),
+						HomeRows().child(),
+						Home().child()
+					).toString()
+				),
+				"Pawns in start should serialize to <start>"
+			);
 
-			board.addPawn(pawn);
+			board.addPawn(pawn1);
+			board.addPawn(pawn2);
 
-			board.movePawnForward(pawn, parcheesi.Parameters.Board.maxPawnTravelDistance - 1);
+			check(
+				serializer.serialize(pawns, board).toString().equals(
+					Board().child(
+						Start().child(
+							pawnToPawnNode.apply(pawn3, board),
+							pawnToPawnNode.apply(pawn4, board)
+						),
+						Main().child(
+							pawnToPieceLoc.apply(pawn1, board),
+							pawnToPieceLoc.apply(pawn2, board)
+						),
+						HomeRows().child(),
+						Home().child()
+					).toString()
+				),
+				"Pawns in main should serialize to <main>"
+			);
 
-			System.out.println(serializer.serialize(pawns, board));
+			board.movePawnForward(pawn1, parcheesi.Parameters.Board.maxPawnTravelDistance - 2);
+
+			check(
+				serializer.serialize(pawns, board).toString().equals(
+					Board().child(
+						Start().child(
+							pawnToPawnNode.apply(pawn3, board),
+							pawnToPawnNode.apply(pawn4, board)
+						),
+						Main().child(
+							pawnToPieceLoc.apply(pawn2, board)
+						),
+						HomeRows().child(
+							pawnToPieceLoc.apply(pawn1, board)
+						),
+						Home().child()
+					).toString()
+				),
+				"Pawns in home row should serialize to <home-rows>"
+			);
+
+			board.movePawnForward(pawn1, 1);
+
+			check(
+				serializer.serialize(pawns, board).toString().equals(
+					Board().child(
+						Start().child(
+							pawnToPawnNode.apply(pawn3, board),
+							pawnToPawnNode.apply(pawn4, board)
+						),
+						Main().child(
+							pawnToPieceLoc.apply(pawn2, board)
+						),
+						HomeRows().child(),
+						Home().child(
+							pawnToPawnNode.apply(pawn1, board)
+						)
+					).toString()
+				),
+				"Pawns in home should serialize to <home>"
+			);
 
 			Die[] dice = {
 				new parcheesi.die.NormalDie(1),
 				new parcheesi.die.NormalDie(5)
 			};
 
-			System.out.println();
-			System.out.println(serializer.serialize(dice));
+			List<Die> diceList = Arrays.asList(dice);
 
+			check(
+				serializer.serialize(dice).toString().equals(
+					Dice().child(
+						diceList.stream().map(dieToDieNode).toArray(Node[]::new)
+					).toString()
+				),
+				"Dice array should serialize to <dice>"
+			);
+
+			boolean ex = false;
 			try {
 				Void().child("can't do this");
-			} catch (Exception e) {
-				System.err.println(e.getMessage());
+			} catch (UnsupportedOperationException e) {
+				ex = true;
 			}
+
+			check(ex, "Trying to add a child to an Empty Node throws UnsupportedOperationException");
+
+			summarize();
 		}
 	}
 }

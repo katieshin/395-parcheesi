@@ -11,12 +11,17 @@ import java.util.Map;
 
 import parcheesi.pawn.PawnWhisperer;
 import parcheesi.pawn.Pawn;
+import parcheesi.die.Die;
 import parcheesi.Board;
 
 import static parcheesi.serializer.xml.Element.*;
 import static parcheesi.Parameters.Board.*;
 
 class Fn {
+	static Function<Die, Node<Integer>>
+		dieToDieNode =
+			d -> Die().child(d.getValue());
+
 	static BiFunction<Pawn, Board, Node<Node>>
 		pawnToPawnNode =
 			(pawn, board) ->
