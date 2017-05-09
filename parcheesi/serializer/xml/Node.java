@@ -27,8 +27,20 @@ class Node<T> {
 		return start + body + close;
 	}
 
-	public Node child(T... children) {
-		this.children.addAll(Arrays.asList(children));
+	/* NOTE: I solemnly promise the Java compiler that any RuntimeExceptions are heretofore my own
+	 * damn fault. Because lo, though I walk through the dark'ning cavern of this hell of generics,
+	 * no type may I hold, for the Gods saw fit to erase my types...
+	 */
+	@SuppressWarnings("unchecked")
+	public Node<T> child(T... children) {
+		for (T child : children) {
+			this.child(child);
+		}
+		return this;
+	}
+
+	public Node<T> child(T child) {
+		this.children.add(child);
 		return this;
 	}
 
@@ -38,8 +50,8 @@ class Node<T> {
 		}
 
 		@Override
-		public Node child(T... children) throws UnsupportedOperationException {
-			throw new UnsupportedOperationException("Cannot add children to empty node.");
+		public Node<T> child(Object child) throws UnsupportedOperationException {
+			throw new UnsupportedOperationException("Cannot add child to empty node.");
 		}
 	}
 }

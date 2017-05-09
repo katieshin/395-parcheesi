@@ -13,10 +13,10 @@ import static parcheesi.serializer.xml.Fn.*;
 
 public class BasicXMLSerializer implements Serializer {
 	public Node serialize(Pawn[] pawns, Board board) {
-		Node startNode    = Start();
-		Node mainNode     = Main();
-		Node homeRowsNode = HomeRows();
-		Node homeNode     = Home();
+		Node<Node> startNode    = Start();
+		Node<Node> mainNode     = Main();
+		Node<Node> homeRowsNode = HomeRows();
+		Node<Node> homeNode     = Home();
 
 		List<Pawn> pawnsList = Arrays.asList(pawns);
 
@@ -41,40 +41,45 @@ public class BasicXMLSerializer implements Serializer {
 	}
 
 	public static void main(String[] args) throws Die.InvalidDieException {
-		// FIXME: these are tests aren't these tests aren't these
-		Board board = new Board();
+		new BasicXMLSerializerTester();
+	}
 
-		Serializer serializer = new BasicXMLSerializer();
+	private static class BasicXMLSerializerTester extends parcheesi.test.Tester {
+		BasicXMLSerializerTester() throws Die.InvalidDieException {
+			Board board = new Board();
 
-		String color = parcheesi.Color.forPlayer(0).getColorName();
+			Serializer serializer = new BasicXMLSerializer();
 
-		Pawn pawn = new Pawn(0, color);
+			String color = parcheesi.Color.forPlayer(0).getColorName();
 
-		Pawn[] pawns = {
-			pawn,
-			new Pawn(1, color),
-			new Pawn(2, color),
-			new Pawn(3, color)
-		};
+			Pawn pawn = new Pawn(0, color);
 
-		board.addPawn(pawn);
+			Pawn[] pawns = {
+				pawn,
+				new Pawn(1, color),
+				new Pawn(2, color),
+				new Pawn(3, color)
+			};
 
-		board.movePawnForward(pawn, parcheesi.Parameters.Board.maxPawnTravelDistance - 1);
+			board.addPawn(pawn);
 
-		System.out.println(serializer.serialize(pawns, board));
+			board.movePawnForward(pawn, parcheesi.Parameters.Board.maxPawnTravelDistance - 1);
 
-		Die[] dice = {
-			new parcheesi.die.NormalDie(1),
-			new parcheesi.die.NormalDie(5)
-		};
+			System.out.println(serializer.serialize(pawns, board));
 
-		System.out.println();
-		System.out.println(serializer.serialize(dice));
+			Die[] dice = {
+				new parcheesi.die.NormalDie(1),
+				new parcheesi.die.NormalDie(5)
+			};
 
-		try {
-			Void().child("can't do this");
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			System.out.println();
+			System.out.println(serializer.serialize(dice));
+
+			try {
+				Void().child("can't do this");
+			} catch (Exception e) {
+				System.err.println(e.getMessage());
+			}
 		}
 	}
 }
