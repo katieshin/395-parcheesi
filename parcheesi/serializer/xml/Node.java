@@ -27,9 +27,9 @@ class Node<T> {
 		return start + body + close;
 	}
 
-	/* NOTE: I solemnly promise the Java compiler that any RuntimeExceptions are heretofore my own
+	/* NOTE: I solemnly swear to the Java compiler that any RuntimeExceptions are heretofore my own
 	 * damn fault. Because lo, though I walk through the dark'ning cavern of this hell of generics,
-	 * no type may I hold, for the Gods saw fit to erase my types...
+	 * no type may I hold, for the Gods saw fit to erase them...
 	 */
 	@SuppressWarnings("unchecked")
 	public Node<T> child(T... children) {
