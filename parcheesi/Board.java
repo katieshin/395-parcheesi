@@ -105,11 +105,11 @@ public class Board {
 	}
 
 	public boolean inHome(Pawn p) {
-		return this.pawnDistance(p) == maxPawnTravelDistance;
+		return this.pawnDistance(p) == (maxPawnTravelDistance - 1);
 	}
 
 	public boolean inHomeRow(Pawn p) {
-		return this.getPawnCoordinate(p) > (maxPawnTravelDistance - spacesPerRow + 2);
+		return this.pawnDistance(p) > (maxPawnTravelDistance - spacesPerRow + 2);
 	}
 
 	public boolean inMain(Pawn p) {
