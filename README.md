@@ -1,5 +1,5 @@
 # Parcheesi
-### Jordan Timmerman and Katie Shin
+### Jordan Timmerman and Katie Shin and Steven Vorbrich
 
 ...
 
