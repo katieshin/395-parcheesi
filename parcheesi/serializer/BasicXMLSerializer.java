@@ -110,24 +110,31 @@ public class BasicXMLSerializer implements Serializer {
 			(node, action) ->
 				(pawn, board) -> node.child(action.apply(pawn, board));
 
+	private static Map<Predicate<Pawn>, BiFunction<Pawn, Board, Node>>
+		nodeOperations(Board board, Node startNode, Node mainNode, Node homeRowsNode, Node homeNode) {
+			Map<Predicate<Pawn>, BiFunction<Pawn, Board, Node>> nodeOperations = new HashMap();
+
+			nodeOperations.put(board::inHomeRow, childMapper.apply(homeRowsNode, pawnToPieceLoc));
+			nodeOperations.put(board::inStart,   childMapper.apply(startNode, pawnToPawnNode));
+			nodeOperations.put(board::inHome,    childMapper.apply(homeNode, pawnToPawnNode));
+			nodeOperations.put(board::inMain,    childMapper.apply(mainNode, pawnToPieceLoc));
+
+			return nodeOperations;
+	}
+
 	public Node serialize(Pawn[] pawns, Board board) {
 		Node startNode    = Start();
 		Node mainNode     = Main();
 		Node homeRowsNode = HomeRows();
 		Node homeNode     = Home();
 
-		Map<Predicate<Pawn>, BiFunction<Pawn, Board, Node>> nodeOperations = new HashMap();
-		nodeOperations.put(board::inHomeRow, childMapper.apply(homeRowsNode, pawnToPieceLoc));
-		nodeOperations.put(board::inStart,   childMapper.apply(startNode, pawnToPawnNode));
-		nodeOperations.put(board::inHome,    childMapper.apply(homeNode, pawnToPawnNode));
-		nodeOperations.put(board::inMain,    childMapper.apply(mainNode, pawnToPieceLoc));
-
-		nodeOperations.forEach((predicate, action) ->
-			Arrays.asList(pawns)
-				.stream()
-				.filter(predicate)
-				.forEach(withBoard.apply(board, action))
-		);
+		nodeOperations(board, startNode, mainNode, homeRowsNode, homeNode)
+			.forEach((predicate, action) ->
+				Arrays.asList(pawns)
+					.stream()
+					.filter(predicate)
+					.forEach(withBoard.apply(board, action))
+			);
 
 		return Board().child(startNode, mainNode, homeRowsNode, homeNode);
 	}
