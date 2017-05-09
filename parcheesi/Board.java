@@ -100,6 +100,22 @@ public class Board {
 		}
 	}
 
+	public boolean inStart(Pawn p) {
+		return this.getPawnCoordinate(p) == -1;
+	}
+
+	public boolean inHome(Pawn p) {
+		return this.pawnDistance(p) == maxPawnTravelDistance;
+	}
+
+	public boolean inHomeRow(Pawn p) {
+		return this.getPawnCoordinate(p) > (maxPawnTravelDistance - spacesPerRow + 2);
+	}
+
+	public boolean inMain(Pawn p) {
+		return !(this.inStart(p) || this.inHome(p) || this.inHomeRow(p));
+	}
+
 	// Board spaces/locations.
 	Location[] locations = new Location[size];
 	// TODO:? Public locations mirror using Collections.unmodifiableList?
