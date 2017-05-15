@@ -35,7 +35,7 @@ public class BasicXMLSerializer implements Serializer {
 		return Dice().child(
 			Arrays.asList(dice)
 				.stream()
-				.map(dieToDieNode)
+				.map(Fn::dieToDieNode)
 				.toArray(Node[]::new)
 		);
 	}
@@ -61,10 +61,10 @@ public class BasicXMLSerializer implements Serializer {
 				serializer.serialize(pawns, board).toString().equals(
 					Board().child(
 						Start().child(
-							pawnToPawnNode.apply(pawn1, board),
-							pawnToPawnNode.apply(pawn2, board),
-							pawnToPawnNode.apply(pawn3, board),
-							pawnToPawnNode.apply(pawn4, board)
+							pawnToPawnNode(pawn1, board),
+							pawnToPawnNode(pawn2, board),
+							pawnToPawnNode(pawn3, board),
+							pawnToPawnNode(pawn4, board)
 						),
 						Main().child(),
 						HomeRows().child(),
@@ -81,12 +81,12 @@ public class BasicXMLSerializer implements Serializer {
 				serializer.serialize(pawns, board).toString().equals(
 					Board().child(
 						Start().child(
-							pawnToPawnNode.apply(pawn3, board),
-							pawnToPawnNode.apply(pawn4, board)
+							pawnToPawnNode(pawn3, board),
+							pawnToPawnNode(pawn4, board)
 						),
 						Main().child(
-							pawnToPieceLoc.apply(pawn1, board),
-							pawnToPieceLoc.apply(pawn2, board)
+							pawnToPieceLoc(pawn1, board),
+							pawnToPieceLoc(pawn2, board)
 						),
 						HomeRows().child(),
 						Home().child()
@@ -101,14 +101,14 @@ public class BasicXMLSerializer implements Serializer {
 				serializer.serialize(pawns, board).toString().equals(
 					Board().child(
 						Start().child(
-							pawnToPawnNode.apply(pawn3, board),
-							pawnToPawnNode.apply(pawn4, board)
+							pawnToPawnNode(pawn3, board),
+							pawnToPawnNode(pawn4, board)
 						),
 						Main().child(
-							pawnToPieceLoc.apply(pawn2, board)
+							pawnToPieceLoc(pawn2, board)
 						),
 						HomeRows().child(
-							pawnToPieceLoc.apply(pawn1, board)
+							pawnToPieceLoc(pawn1, board)
 						),
 						Home().child()
 					).toString()
@@ -122,15 +122,15 @@ public class BasicXMLSerializer implements Serializer {
 				serializer.serialize(pawns, board).toString().equals(
 					Board().child(
 						Start().child(
-							pawnToPawnNode.apply(pawn3, board),
-							pawnToPawnNode.apply(pawn4, board)
+							pawnToPawnNode(pawn3, board),
+							pawnToPawnNode(pawn4, board)
 						),
 						Main().child(
-							pawnToPieceLoc.apply(pawn2, board)
+							pawnToPieceLoc(pawn2, board)
 						),
 						HomeRows().child(),
 						Home().child(
-							pawnToPawnNode.apply(pawn1, board)
+							pawnToPawnNode(pawn1, board)
 						)
 					).toString()
 				),
@@ -147,7 +147,7 @@ public class BasicXMLSerializer implements Serializer {
 			check(
 				serializer.serialize(dice).toString().equals(
 					Dice().child(
-						diceList.stream().map(dieToDieNode).toArray(Node[]::new)
+						diceList.stream().map(Fn::dieToDieNode).toArray(Node[]::new)
 					).toString()
 				),
 				"Dice array should serialize to <dice>"

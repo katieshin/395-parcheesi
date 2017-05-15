@@ -18,37 +18,34 @@ import static parcheesi.serializer.xml.Element.*;
 import static parcheesi.Parameters.Board.*;
 
 class Fn {
-	static Function<Die, Node<Integer>>
-		dieToDieNode =
-			d -> Die().child(d.getValue());
+	static Node<Integer> dieToDieNode(Die d) {
+		return Die().child(d.getValue());
+	}
 
-	static BiFunction<Pawn, Board, Node<Node>>
-		pawnToPawnNode =
-			(pawn, board) ->
-				Pawn().child(
-					Color().child(PawnWhisperer.color(pawn).getColorName()),
-					Id().child(PawnWhisperer.id(pawn))
-				);
+	static Node<Node> pawnToPawnNode(Pawn pawn, Board board) {
+		return Pawn().child(
+			Color().child(PawnWhisperer.color(pawn).getColorName()),
+			Id().child(PawnWhisperer.id(pawn))
+		);
+	}
 
-	static BiFunction<Pawn, Board, Node<Node>>
-		pawnToPieceLoc =
-			(pawn, board) ->
-				PieceLoc().child(
-					pawnToPawnNode.apply(pawn, board),
-					Loc().child(
-						board.pawnDistance(pawn) + (spacesPerRow / 2)
-					)
-				);
+	static Node<Node> pawnToPieceLoc(Pawn pawn, Board board) {
+		return PieceLoc().child(
+			pawnToPawnNode(pawn, board),
+			Loc().child(
+				// FIXME: re-indexing is hard-coded here; should be defined by message format?
+				board.pawnDistance(pawn) + (spacesPerRow / 2)
+			)
+		);
+	}
 
-	static BiFunction<Board, BiFunction<Pawn, Board, Node<Node>>, Function<Pawn, Node<Node>>>
-		withBoard =
-			(board, action) ->
-				pawn -> action.apply(pawn, board);
+	static Function<Pawn, Node<Node>> withBoard(Board board, BiFunction<Pawn, Board, Node<Node>> action) {
+		return pawn -> action.apply(pawn, board);
+	}
 
-	static BiFunction<Node<Node>, Function<Pawn, Node<Node>>, Consumer<Pawn>>
-		childMapper =
-			(node, action) ->
-				pawn -> node.child(action.apply(pawn));
+	static Consumer<Pawn> pawnToChildMapper(Node<Node> parent, Function<Pawn, Node<Node>> action) {
+		return pawn -> parent.child(action.apply(pawn));
+	}
 
 	static Map<Predicate<Pawn>, Consumer<Pawn>> nodeOperations(
 			Board board,
@@ -60,19 +57,19 @@ class Fn {
 			return new HashMap<Predicate<Pawn>, Consumer<Pawn>>() {{
 				put(
 					board::inHomeRow,
-					childMapper.apply(homeRowsNode, withBoard.apply(board, pawnToPieceLoc))
+					pawnToChildMapper(homeRowsNode, withBoard(board, Fn::pawnToPieceLoc))
 				);
 				put(
 					board::inStart,
-					childMapper.apply(startNode, withBoard.apply(board, pawnToPawnNode))
+					pawnToChildMapper(startNode, withBoard(board, Fn::pawnToPawnNode))
 				);
 				put(
 					board::inHome,
-					childMapper.apply(homeNode, withBoard.apply(board, pawnToPawnNode))
+					pawnToChildMapper(homeNode, withBoard(board, Fn::pawnToPawnNode))
 				);
 				put(
 					board::inMain,
-					childMapper.apply(mainNode, withBoard.apply(board, pawnToPieceLoc))
+					pawnToChildMapper(mainNode, withBoard(board, Fn::pawnToPieceLoc))
 				);
 			}};
 	}
