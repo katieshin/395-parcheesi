@@ -153,15 +153,6 @@ public class BasicXMLSerializer implements Serializer {
 				"Dice array should serialize to <dice>"
 			);
 
-			boolean ex = false;
-			try {
-				Void().child("can't do this");
-			} catch (UnsupportedOperationException e) {
-				ex = true;
-			}
-
-			check(ex, "Trying to add a child to an Empty Node throws UnsupportedOperationException");
-
 			summarize();
 		}
 	}
