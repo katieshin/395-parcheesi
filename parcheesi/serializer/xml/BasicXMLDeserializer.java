@@ -3,10 +3,56 @@ package parcheesi.serializer.xml;
 import static parcheesi.Utils.*;
 import static parcheesi.serializer.xml.Element.*;
 
-// Let's be horrifyingly inefficient.
 public class BasicXMLDeserializer implements XMLDeserializer {
-	public Node<Node> parse(String string) {
-		return Board();
+	public Node parse(String string) {
+		int end = string.indexOf("</do-move>");
+		if (end != -1) return parseDoMove(string.substring("<do-move>".length(), end));
+
+		end = string.indexOf("</start-game>");
+		if (end != -1) return parseStartGame(string.substring("<start-game>".length(), end));
+
+		end = string.indexOf("</doubles-penalty>");
+		if (end != -1) return parseDoublesPenalty(string.substring("<doubles-penalty>".length(), end));
+
+		return Void();
+	}
+
+	public Node<Node> parseDoMove(String string) {
+		Node<Node> doMoveNode = DoMove();
+
+		int start = string.indexOf("<board>");
+		int end = string.indexOf("</board>");
+		doMoveNode.child(parseBoard(string.substring(start + "<board>".length(), end)));
+
+		start = string.indexOf("<dice>");
+		end = string.indexOf("</dice>");
+		doMoveNode.child(Dice().child(parseDice(string.substring(start + "<dice>".length(), end))));
+
+		return doMoveNode;
+	}
+
+	public Node<String> parseStartGame(String string) {
+		Node<String> startGameNode = StartGame();
+
+		startGameNode.child(string);
+
+		return startGameNode;
+	}
+
+	public Node<Node> parseDoublesPenalty(String string) {
+		return DoublesPenalty();
+	}
+
+	public Node[] parseDice(String string) {
+		String[] dieStrings = string.split("</die>");
+		Node[] dieNodes     = new Node[dieStrings.length];
+
+		for (int i = 0; i < dieStrings.length; i++) {
+			String dieString = dieStrings[i];
+			dieNodes[i] = Die().child(Integer.parseInt(dieString.substring("<die>".length())));
+		}
+
+		return dieNodes;
 	}
 
 	public Node<Node> parseBoard(String string) {
@@ -162,7 +208,46 @@ public class BasicXMLDeserializer implements XMLDeserializer {
 
 			check(
 				deserializer.parseBoard(someBoard.toString()).toString().equals(someBoard.toString()),
-				"Parsing a node string results in the same node"
+				"Parsing a board node after toString results in equivalent node"
+			);
+
+			Node someDice = Dice().child(
+				Die().child(5),
+				Die().child(2)
+			);
+
+			check(
+				someDice.toString().equals(
+					Dice().child(
+						deserializer.parseDice(
+							someDice.toString()
+							.substring("<dice>".length(),
+								someDice.toString().length() - "</dice>".length())
+						)
+					).toString()
+				),
+				"Parsing a dice node after toString results in equivalent node"
+			);
+
+			Node someDoMove = DoMove().child(someBoard, someDice);
+
+			check(
+				deserializer.parse(someDoMove.toString()).toString().equals(someDoMove.toString()),
+				"Parsing a do-move node after toString results in equivalent node"
+			);
+
+			Node someStartGame = StartGame().child(parcheesi.Color.forPlayer(0).getColorName());
+
+			check(
+				deserializer.parse(someStartGame.toString()).toString().equals(someStartGame.toString()),
+				"Parsing a start-game node after toString results in equivalent node"
+			);
+
+			Node someDoublesPenalty = DoublesPenalty();
+
+			check(
+				deserializer.parse(someDoublesPenalty.toString()).toString().equals(someDoublesPenalty.toString()),
+				"Parsing a doubles-penalty node after toString results in equivalent node"
 			);
 
 			summarize();
