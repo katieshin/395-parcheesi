@@ -1,146 +1,107 @@
 package parcheesi.serializer.xml;
 
+import java.util.function.BiFunction;
+
 import static parcheesi.Utils.*;
 import static parcheesi.serializer.xml.Element.*;
 
 public class BasicXMLDeserializer implements XMLDeserializer {
-	public Node parse(String string) {
-		int end = string.indexOf("</do-move>");
-		if (end != -1) return parseDoMove(string.substring("<do-move>".length(), end));
+	public Node parse(String document) {
+		if (document.length() >= 3) {
+			String firstNode = getFirstNode(document);
+			String firstNodeBody = tagContents(firstNode, document);
 
-		end = string.indexOf("</start-game>");
-		if (end != -1) return parseStartGame(string.substring("<start-game>".length(), end));
-
-		end = string.indexOf("</doubles-penalty>");
-		if (end != -1) return parseDoublesPenalty(string.substring("<doubles-penalty>".length(), end));
-
-		return Void();
-	}
-
-	public Node<Node> parseDoMove(String string) {
-		Node<Node> doMoveNode = DoMove();
-
-		int start = string.indexOf("<board>");
-		int end = string.indexOf("</board>");
-		doMoveNode.child(parseBoard(string.substring(start + "<board>".length(), end)));
-
-		start = string.indexOf("<dice>");
-		end = string.indexOf("</dice>");
-		doMoveNode.child(Dice().child(parseDice(string.substring(start + "<dice>".length(), end))));
-
-		return doMoveNode;
-	}
-
-	public Node<String> parseStartGame(String string) {
-		Node<String> startGameNode = StartGame();
-
-		startGameNode.child(string);
-
-		return startGameNode;
-	}
-
-	public Node<Node> parseDoublesPenalty(String string) {
-		return DoublesPenalty();
-	}
-
-	public Node[] parseDice(String string) {
-		String[] dieStrings = string.split("</die>");
-		Node[] dieNodes     = new Node[dieStrings.length];
-
-		for (int i = 0; i < dieStrings.length; i++) {
-			String dieString = dieStrings[i];
-			dieNodes[i] = Die().child(Integer.parseInt(dieString.substring("<die>".length())));
+			if (firstNode.equals("do-move")) {
+				return parse(DoMove(), this::parseDoMove, document);
+			} else if (firstNode.equals("start-game")) {
+				return StartGame().child(firstNodeBody);
+			} else if (firstNode.equals("doubles-penalty")) {
+				return DoublesPenalty();
+			}
 		}
 
-		return dieNodes;
+		return new Node.Empty("parse-failure");
 	}
 
-	public Node<Node> parseBoard(String string) {
-		Node<Node> boardNode = Board();
-
-		Node<Node> startNode = Start();
-		int start = string.indexOf("<start>");
-		int end = string.indexOf("</start>");
-		startNode.child(parsePawns(string.substring(start + ("<start>").length(), end)));
-		boardNode.child(startNode);
-
-		Node<Node> mainNode = Main();
-		start = string.indexOf("<main>");
-		end = string.indexOf("</main>");
-		mainNode.child(parsePieceLocs(string.substring(start + ("<main>").length(), end)));
-		boardNode.child(mainNode);
-
-		Node<Node> homeRowsNode = HomeRows();
-		start = string.indexOf("<home-rows>");
-		end = string.indexOf("</home-rows>");
-		homeRowsNode.child(parsePieceLocs(string.substring(start + ("<home-rows>").length(), end)));
-		boardNode.child(homeRowsNode);
-
-		Node<Node> homeNode = Home();
-		start = string.indexOf("<home>");
-		end = string.indexOf("</home>");
-		homeNode.child(parsePawns(string.substring(start + ("<home>").length(), end)));
-		boardNode.child(homeNode);
-
-		return boardNode;
+	private String getFirstNode(String document) {
+		// NOTE: Why the magic 1? This function assumes a valid document and thus skips starting "<".
+		return document.substring(1, document.indexOf(">"));
 	}
 
-	public Node[] parsePawns(String string) {
-		String[] pawnStrings = string.split("</pawn>");
-		Node[] pawnNodes     = new Node[pawnStrings.length];
+	private String tagContents(String tag, String document) {
+		String tagEnd = tag + ">";
+		String openTag = "<" + tagEnd;
+		String closeTag = "</" + tagEnd;
 
-		for (int i = 0; i < pawnStrings.length; i ++) {
-			String pawnString = pawnStrings[i];
-			pawnNodes[i] = parsePawn(pawnString.substring("<pawn>".length()));
+		int start = document.indexOf(openTag);
+		int end = document.indexOf(closeTag);
+		return document.substring(start + openTag.length(), end);
+	}
+
+	private Node<Node> parseDoMove(Node parent, String document) {
+		return parent.child(
+			parse(Board(), this::parseBoard, document),
+			parse(Dice(), this::parseDice, document)
+		);
+	}
+
+	private Node parseDice(Node parent, String string) {
+		for (String dieString : string.split("</die>")) {
+			parent.child(
+				Die().child(
+					Integer.parseInt(tagContents("die", dieString + "</die>"))
+				)
+			);
 		}
 
-		return pawnNodes;
+		return parent;
 	}
 
-	public Node<Node> parsePawn(String pawnString) {
-		Node<Node> pawnNode = Pawn();
-
-		Node<String> colorNode = Color();
-		int start = pawnString.indexOf("<color>");
-		int end = pawnString.indexOf("</color>");
-		colorNode.child(pawnString.substring(start + "<color>".length(), end));
-		pawnNode.child(colorNode);
-
-		Node<Integer> idNode = Id();
-		start = pawnString.indexOf("<id>");
-		end = pawnString.indexOf("</id>");
-		idNode.child(Integer.parseInt(pawnString.substring(start + "<id>".length(), end)));
-		pawnNode.child(idNode);
-
-		return pawnNode;
+	private Node<Node> parseBoard(Node parent, String document) {
+		return parent.child(
+			parse(Start(),    this::parsePawns,     document),
+			parse(Main(),     this::parsePieceLocs, document),
+			parse(HomeRows(), this::parsePieceLocs, document),
+			parse(Home(),     this::parsePawns,     document)
+		);
 	}
 
-	public Node[] parsePieceLocs(String string) {
-		String[] pieceLocStrings = string.split("</piece-loc>");
-		Node[] pieceLocNodes     = new Node[pieceLocStrings.length];
+	private Node parse(Node parent, BiFunction<Node, String, Node> parser, String document) {
+		return parser.apply(parent, tagContents(parent.getName(), document));
+	}
 
-		for (int i = 0; i < pieceLocStrings.length; i ++) {
-			String pieceLocString = pieceLocStrings[i];
-			pieceLocNodes[i] = parsePieceLoc(pieceLocString.substring("<piece-loc>".length()));
+	private Node parsePawns(Node parent, String document) {
+		for (String pawnString : document.split("</pawn>")) {
+			parent.child(
+				parse(Pawn(), this::parsePawn, pawnString + "</pawn>")
+			);
 		}
 
-		return pieceLocNodes;
+		return parent;
 	}
 
-	public Node<Node> parsePieceLoc(String pieceLocString) {
-		Node<Node> pieceLocNode = PieceLoc();
+	private Node parsePawn(Node parent, String pawnString) {
+		return parent.child(
+			Color().child(tagContents("color", pawnString)),
+			Id().child(Integer.parseInt(tagContents("id", pawnString)))
+		);
+	}
 
-		int start = pieceLocString.indexOf("<pawn>");
-		int end = pieceLocString.indexOf("</pawn>");
-		pieceLocNode.child(parsePawn(pieceLocString.substring(start + "<pawn>".length(), end)));
+	private Node parsePieceLocs(Node parent, String document) {
+		for (String pieceLocString : document.split("</piece-loc>")) {
+			parent.child(
+				parse(PieceLoc(), this::parsePieceLoc, pieceLocString + "</piece-loc>")
+			);
+		}
 
-		Node<Integer> locNode = Loc();
-		start = pieceLocString.indexOf("<loc>");
-		end = pieceLocString.indexOf("</loc>");
-		locNode.child(Integer.parseInt(pieceLocString.substring(start + "<loc>".length(), end)));
-		pieceLocNode.child(locNode);
+		return parent;
+	}
 
-		return pieceLocNode;
+	private Node<Node> parsePieceLoc(Node parent, String pieceLocString) {
+		return parent.child(
+			parse(Pawn(), this::parsePawn, pieceLocString),
+			Loc().child(Integer.parseInt(tagContents("loc", pieceLocString)))
+		);
 	}
 
 	public static void main(String[] args) {
@@ -207,7 +168,7 @@ public class BasicXMLDeserializer implements XMLDeserializer {
 			);
 
 			check(
-				deserializer.parseBoard(someBoard.toString()).toString().equals(someBoard.toString()),
+				deserializer.parse(Board(), deserializer::parseBoard, someBoard.toString()).toString().equals(someBoard.toString()),
 				"Parsing a board node after toString results in equivalent node"
 			);
 
@@ -218,13 +179,7 @@ public class BasicXMLDeserializer implements XMLDeserializer {
 
 			check(
 				someDice.toString().equals(
-					Dice().child(
-						deserializer.parseDice(
-							someDice.toString()
-							.substring("<dice>".length(),
-								someDice.toString().length() - "</dice>".length())
-						)
-					).toString()
+					deserializer.parse(Dice(), deserializer::parseDice, someDice.toString()).toString()
 				),
 				"Parsing a dice node after toString results in equivalent node"
 			);
@@ -232,22 +187,37 @@ public class BasicXMLDeserializer implements XMLDeserializer {
 			Node someDoMove = DoMove().child(someBoard, someDice);
 
 			check(
-				deserializer.parse(someDoMove.toString()).toString().equals(someDoMove.toString()),
+				deserializer.parse(someDoMove.toString()).toString()
+					.equals(someDoMove.toString()),
 				"Parsing a do-move node after toString results in equivalent node"
 			);
 
 			Node someStartGame = StartGame().child(parcheesi.Color.forPlayer(0).getColorName());
 
 			check(
-				deserializer.parse(someStartGame.toString()).toString().equals(someStartGame.toString()),
+				deserializer.parse(someStartGame.toString()).toString()
+					.equals(someStartGame.toString()),
 				"Parsing a start-game node after toString results in equivalent node"
 			);
 
 			Node someDoublesPenalty = DoublesPenalty();
 
 			check(
-				deserializer.parse(someDoublesPenalty.toString()).toString().equals(someDoublesPenalty.toString()),
+				deserializer.parse(someDoublesPenalty.toString()).toString()
+					.equals(someDoublesPenalty.toString()),
 				"Parsing a doubles-penalty node after toString results in equivalent node"
+			);
+
+			check(
+				deserializer.parse("").toString()
+					.equals("<parse-failure></parse-failure>"),
+				"Parsing empty string results in parse-failure"
+			);
+
+			check(
+				deserializer.parse("<not-expected></not-expected>").toString()
+					.equals("<parse-failure></parse-failure>"),
+				"Parsing an unknown top-level node results in parse-failure"
 			);
 
 			summarize();

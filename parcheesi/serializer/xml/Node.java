@@ -27,6 +27,10 @@ class Node<T> {
 		return start + body + close;
 	}
 
+	public String getName() {
+		return this.name;
+	}
+
 	/* NOTE: I solemnly swear to the Java compiler that any RuntimeExceptions are heretofore my own
 	 * damn fault. Because lo, though I walk through the dark'ning cavern of this hell of generics,
 	 * no type may I hold, for the Gods saw fit to erase them...
