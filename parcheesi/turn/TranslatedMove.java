@@ -84,4 +84,14 @@ class TranslatedMove {
 			.filter(a -> a.isApplicable(MoveClass, die, pawn, board))
 			.collect(Collectors.toList());
 	}
+
+	public static void main(String[] args) {
+		new TranslatedMoveTester();
+	}
+
+	private static class TranslatedMoveTester extends parcheesi.test.Tester {
+		public TranslatedMoveTester() {
+			summarize();
+		}
+	}
 }
