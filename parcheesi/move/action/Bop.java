@@ -22,7 +22,7 @@ public class Bop implements Action {
 			);
 		}
 
-		if (!preconditionAction.apply(die, pawn, board)) {
+		if (!preconditionAction.apply(die, pawn, testBoard)) {
 			return false;
 		}
 
