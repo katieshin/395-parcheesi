@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import parcheesi.pawn.PawnWhisperer;
 import parcheesi.pawn.Pawn;
 import parcheesi.die.Die;
 import parcheesi.Board;
@@ -24,8 +23,8 @@ class Fn {
 
 	static Node<Node> pawnToPawnNode(Pawn pawn, Board board) {
 		return Pawn().child(
-			Color().child(PawnWhisperer.color(pawn).getColorName()),
-			Id().child(PawnWhisperer.id(pawn))
+			Color().child(parcheesi.Color.Player.lookupByColorName(pawn.color)),
+			Id().child(pawn.id)
 		);
 	}
 
