@@ -1,18 +1,23 @@
 package parcheesi.turn;
 
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
 
 import parcheesi.move.action.Action;
+import parcheesi.move.EnterPiece;
+import parcheesi.move.MoveMain;
+import parcheesi.move.MoveHome;
 import parcheesi.move.Move;
 import parcheesi.pawn.Pawn;
 import parcheesi.die.Die;
 import parcheesi.Board;
 
 class TranslatedMove {
-
-	Class<? extends Move> MoveClass;
-	List<Action> actions;
+	private Class<? extends Move> MoveClass;
+	private List<Action> actions;
+	private Die die;
+	private Pawn pawn;
 
 	/**
 	 * Create the complete move encapsulating all of the Actions taken by some Pawn on some Board
@@ -22,9 +27,17 @@ class TranslatedMove {
 	 * @param pawn The Pawn using the Die
 	 * @param board The Board on which the Pawn moves
 	 */
-	public TranslatedMove(Die die, Pawn pawn, Board board) {
-		MoveClass = getMoveClass(dice, pawn, board);
-		actions   = getApplicableActions(MoveClass, die, pawn, board);
+	public TranslatedMove(Die die, Pawn pawn, Board board) throws IllegalStateException {
+		this.die  = die;
+		this.pawn = pawn;
+
+		List<Class<? extends Move>> possibleMoveClasses = getMoveClasses(die, pawn, board);
+		if (possibleMoveClasses.size() != 1) {
+			throw new IllegalStateException("A TranslatedMove somehow has more than 1 MoveClass");
+		}
+
+		this.MoveClass = possibleMoveClasses.get(0);
+		this.actions   = getApplicableActions(MoveClass, die, pawn, board);
 	}
 
 	/**
@@ -35,21 +48,19 @@ class TranslatedMove {
 	 * @return Board resulting from applying every Action to take for this TranslatedMove
 	 */
 	public Board take(Board board) {
-		Board result = new Board(board);
+		Board resultBoard = new Board(board);
 
 		for (Action action : actions) {
-			action.take(result);
+			action.apply(die, pawn, resultBoard);
 		}
 
-		return result;
+		return resultBoard;
 	}
 
-	private Class<? extends Move> getMoveClass(Die die, Pawn pawn, Board board) {
-		for (Class<? extends Move> MoveClass : Move.MOVE_CLASSES) {
-			if (isMoveFeasible(MoveClass, die, pawn, board)) {
-				return MoveClass;
-			}
-		}
+	private List<Class<? extends Move>> getMoveClasses(Die die, Pawn pawn, Board board) {
+		return parcheesi.move.Manifest.MOVE_CLASSES.stream()
+			.filter(MoveClass -> isMoveFeasible(MoveClass, die, pawn, board))
+			.collect(Collectors.toList());
 	}
 
 	private boolean isMoveFeasible(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
@@ -68,15 +79,9 @@ class TranslatedMove {
 
 	// Assuming a Move is feasible, what modifiers apply to the Move?
 	private List<Action> getApplicableActions(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
-		List<Action> applicableActions = new ArrayList<Action>();
-
-		// FIXME: the terminology here is kinda fucked up, but it works well enough.
-		for (Action actionType : Action.ACTIONS) {
-			if (actionType.action.isApplicable(MoveClass, die, pawn, board)) {
-				applicableActions.add(actionType.action);
-			}
-		}
-
-		return applicableActions;
+		return parcheesi.move.action.Manifest.ACTIONS
+			.stream()
+			.filter(a -> a.isApplicable(MoveClass, die, pawn, board))
+			.collect(Collectors.toList());
 	}
 }

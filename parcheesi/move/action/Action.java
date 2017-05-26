@@ -6,6 +6,6 @@ import parcheesi.die.Die;
 import parcheesi.Board;
 
 public interface Action {
-	boolean isApplicable(Class<? extends Move> MoveClass, Board board, Die die, Pawn pawn);
-	boolean apply(Board board, Die die, Pawn pawn);
+	boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board);
+	boolean apply(Die die, Pawn pawn, Board board);
 }

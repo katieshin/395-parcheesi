@@ -1,19 +1,23 @@
 package parcheesi.move.action;
 
+import java.util.List;
+
 import parcheesi.move.Move;
 import parcheesi.pawn.Pawn;
 import parcheesi.die.Die;
 import parcheesi.Board;
 
-public class BreakBlockade extends MoveAction {
-	@Override
-	boolean isApplicable(Class<? extends Move> MoveClass, Board board, Die die, Pawn pawn) {
-		if (!super.isApplicable(MoveClass, board, die, pawn)) {
-			return false;
-		}
+public class BreakBlockade extends MoveForward {
+	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
+		List<Pawn> pawns = board.getPawnsAtCoordinate(board.getPawnCoordinate(pawn));
+		boolean currentlyInBlockade = pawns.stream().anyMatch(p -> pawn.color.equals(p.color));
 
-		// TODO: True if there's a pawn of the same color on the board location you are leaving.
-		BreakBlockadeMoveRules.applicable(board, die, pawn);
+		return super.isApplicable(MoveClass, die, pawn, board) && currentlyInBlockade;
+	}
+
+	public boolean apply(Die die, Pawn pawn, Board board) {
+		// TODO: Remove a blockade from a data structure.
+		return false;
 	}
 
 	public static void main(String[] args) {

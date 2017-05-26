@@ -8,13 +8,13 @@ import parcheesi.die.Die;
 import parcheesi.Board;
 
 public class Bop implements Action {
-	public boolean isApplicable(Class<? extends Move> MoveClass, Board board, Die die, Pawn pawn) {
+	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
 		Board testBoard = new Board(board);
 		Action preconditionAction;
 
-		if (MoveForward.action.isApplicable(MoveClass, board, die, pawn)) {
+		if (MoveForward.action.isApplicable(MoveClass, die, pawn, board)) {
 			preconditionAction = MoveForward.action;
-		} else if (Enter.action.isApplicable(MoveClass, board, die, pawn)) {
+		} else if (Enter.action.isApplicable(MoveClass, die, pawn, board)) {
 			preconditionAction = Enter.action;
 		} else {
 			throw new UnsupportedOperationException(
@@ -22,7 +22,7 @@ public class Bop implements Action {
 			);
 		}
 
-		if (!preconditionAction.apply(testBoard, die, pawn)) {
+		if (!preconditionAction.apply(die, pawn, board)) {
 			return false;
 		}
 
@@ -33,10 +33,10 @@ public class Bop implements Action {
 		return pawns.stream().anyMatch(p -> !pawn.color.equals(p.color));
 
 		// TODO?:
-		// return BopMoveRules.applicable(board, die, pawn);
+		// return BopMoveRules.applicable(die, pawn, board);
 	}
 
-	public boolean apply(Board board, Die die, Pawn pawn) {
+	public boolean apply(Die die, Pawn pawn, Board board) {
 		int coord = board.getPawnCoordinate(pawn);
 		List<Pawn> pawns = board.getPawnsAtCoordinate(coord);
 
@@ -64,29 +64,29 @@ public class Bop implements Action {
 			Pawn pawn = new Pawn(0, parcheesi.Color.forPlayer(0).getColorName());
 
 			check(
-				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, board, die, pawn),
+				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn, board),
 				"Bop is not applicable for EnterPiece if no other colored pawns on board"
 			);
 
 			check(
-				!Bop.action.isApplicable(parcheesi.move.MoveMain.class, board, die, pawn),
+				!Bop.action.isApplicable(parcheesi.move.MoveMain.class, die, pawn, board),
 				"Bop is not applicable for MoveMain when pawn is not on board"
 			);
 
 			check(
-				!Bop.action.isApplicable(parcheesi.move.MoveHome.class, board, die, pawn),
+				!Bop.action.isApplicable(parcheesi.move.MoveHome.class, die, pawn, board),
 				"Bop is not applicable for MoveHome when pawn is not on board"
 			);
 
 			board.addPawn(pawn);
 
 			check(
-				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, board, die, pawn),
+				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn, board),
 				"Bop is not applicable for EnterPiece if pawn is already on board"
 			);
 
 			check(
-				!Bop.action.isApplicable(parcheesi.move.MoveMain.class, board, die, pawn),
+				!Bop.action.isApplicable(parcheesi.move.MoveMain.class, die, pawn, board),
 				"Bop is not applicable for MoveMain when no other pawns are at destination"
 			);
 
@@ -95,7 +95,7 @@ public class Bop implements Action {
 			board.movePawnForward(otherPawn, parcheesi.Parameters.Board.pawnMainRingDistance - die.getValue());
 
 			check(
-				Bop.action.isApplicable(parcheesi.move.MoveMain.class, board, die, otherPawn),
+				Bop.action.isApplicable(parcheesi.move.MoveMain.class, die, otherPawn, board),
 				"Bop is applicable when other-colored pawn is at destination"
 			);
 
@@ -103,12 +103,12 @@ public class Bop implements Action {
 
 			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(0).getColorName());
 			check(
-				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, board, die, pawn),
+				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn, board),
 				"Bop is not applicable for EnterPiece if Enter action fails"
 			);
 
 			check(
-				Bop.action.isApplicable(parcheesi.move.EnterPiece.class, board, die, pawn2),
+				Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn2, board),
 				"Bop is applicable for EnterPiece where other colored pawn occupies Entry"
 			);
 

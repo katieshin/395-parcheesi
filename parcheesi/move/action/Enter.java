@@ -7,11 +7,11 @@ import parcheesi.die.Die;
 import parcheesi.Board;
 
 public class Enter implements Action {
-	public boolean isApplicable(Class<? extends Move> MoveClass, Board board, Die die, Pawn pawn) {
+	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
 		return MoveClass == EnterPiece.class;
 	}
 
-	public boolean apply(Board board, Die die, Pawn pawn) {
+	public boolean apply(Die die, Pawn pawn, Board board) {
 		return board.addPawn(pawn);
 	}
 
@@ -33,12 +33,12 @@ public class Enter implements Action {
 			Pawn pawn1 = new Pawn(0, parcheesi.Color.forPlayer(0).getColorName());
 
 			check(
-				Enter.action.isApplicable(EnterPiece.class, board, die, pawn1),
+				Enter.action.isApplicable(EnterPiece.class, die, pawn1, board),
 				"Enter move action is applicable for valid EnterPiece conditions"
 			);
 
 			check(
-				Enter.action.apply(board, die, pawn1),
+				Enter.action.apply(die, pawn1, board),
 				"Taking Enter move action succeeds for valid EnterPiece conditions"
 			);
 
@@ -46,12 +46,12 @@ public class Enter implements Action {
 			die = new parcheesi.die.NormalDie(1);
 
 			check(
-				Enter.action.isApplicable(EnterPiece.class, board, die, pawn1),
+				Enter.action.isApplicable(EnterPiece.class, die, pawn1, board),
 				"Enter move action is applicable even if it breaks the rules of EnterPiece"
 			);
 
 			check(
-				Enter.action.apply(board, die, pawn1),
+				Enter.action.apply(die, pawn1, board),
 				"Taking Enter move action succeeds even if it breaks the rules of EnterPiece"
 			);
 
@@ -64,12 +64,12 @@ public class Enter implements Action {
 			board.addPawn(pawn4);
 
 			check(
-				Enter.action.isApplicable(EnterPiece.class, board, die, pawn1),
+				Enter.action.isApplicable(EnterPiece.class, die, pawn1, board),
 				"Enter move action is applicable even if the resulting Board is broke AF"
 			);
 
 			check(
-				!Enter.action.apply(board, die, pawn1),
+				!Enter.action.apply(die, pawn1, board),
 				"Cannot take Enter move action if the resulting Board would be broke AF"
 			);
 

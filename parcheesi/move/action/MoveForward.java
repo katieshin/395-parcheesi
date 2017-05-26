@@ -9,11 +9,11 @@ import parcheesi.Board;
 
 public class MoveForward implements Action {
 	// TODO: What about additional effects? e.g. add/remove a Blockade from Game; create bonus Die...
-	public boolean isApplicable(Class<? extends Move> MoveClass, Board board, Die die, Pawn pawn) {
+	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
 		return MoveClass == MoveMain.class || MoveClass == MoveHome.class;
 	}
 
-	public boolean apply(Board board, Die die, Pawn pawn) {
+	public boolean apply(Die die, Pawn pawn, Board board) {
 		return board.movePawnForward(pawn, die.getValue());
 	}
 
@@ -32,29 +32,29 @@ public class MoveForward implements Action {
 			Pawn pawn = new Pawn(0, parcheesi.Color.forPlayer(0).getColorName());
 
 			check(
-				MoveForward.action.isApplicable(MoveMain.class, board, die, pawn),
+				MoveForward.action.isApplicable(MoveMain.class, die, pawn, board),
 				"MoveForward is applicable for invalid MoveMain conditions"
 			);
 
 			check(
-				MoveForward.action.isApplicable(MoveHome.class, board, die, pawn),
+				MoveForward.action.isApplicable(MoveHome.class, die, pawn, board),
 				"MoveForward is application for invalid MoveHome conditions"
 			);
 
 			board.addPawn(pawn);
 
 			check(
-				MoveForward.action.isApplicable(MoveMain.class, board, die, pawn),
+				MoveForward.action.isApplicable(MoveMain.class, die, pawn, board),
 				"MoveForward is applicable for valid MoveMain conditions"
 			);
 
 			check(
-				MoveForward.action.isApplicable(MoveHome.class, board, die, pawn),
+				MoveForward.action.isApplicable(MoveHome.class, die, pawn, board),
 				"MoveForward is applicable for invalid MoveHome conditions"
 			);
 
 			check(
-				MoveForward.action.apply(board, die, pawn),
+				MoveForward.action.apply(die, pawn, board),
 				"Taking MoveForward succeeds for valid MoveMain conditions and invalid MoveHome conditions"
 			);
 
@@ -66,12 +66,12 @@ public class MoveForward implements Action {
 			board.movePawnForward(pawn, maxPawnTravelDistance - die.getValue() - 1);
 
 			check(
-				MoveForward.action.apply(board, die, pawn),
+				MoveForward.action.apply(die, pawn, board),
 				"Taking MoveForward succeeds for valid MoveHome conditions and invalid MoveMain conditions"
 			);
 
 			check(
-				!MoveForward.action.apply(board, die, pawn),
+				!MoveForward.action.apply(die, pawn, board),
 				"Cannot take MoveForward if the resulting Board would be broke AF (cannot walk off Board)"
 			);
 
