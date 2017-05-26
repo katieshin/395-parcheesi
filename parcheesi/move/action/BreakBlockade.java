@@ -9,10 +9,14 @@ import parcheesi.Board;
 
 public class BreakBlockade extends MoveForward {
 	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
+		if (!super.isApplicable(MoveClass, die, pawn, board)) {
+			return false;
+		}
+
 		List<Pawn> pawns = board.getPawnsAtCoordinate(board.getPawnCoordinate(pawn));
 		boolean currentlyInBlockade = pawns.stream().anyMatch(p -> pawn.color.equals(p.color));
 
-		return super.isApplicable(MoveClass, die, pawn, board) && currentlyInBlockade;
+		return currentlyInBlockade;
 	}
 
 	public boolean apply(Die die, Pawn pawn, Board board) {

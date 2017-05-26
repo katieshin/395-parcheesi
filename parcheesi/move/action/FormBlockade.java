@@ -9,10 +9,16 @@ import parcheesi.Board;
 
 public class FormBlockade extends MoveForward {
 	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
-		List<Pawn> pawns = board.getPawnsAtCoordinate(board.getPawnCoordinate(pawn));
+		if (!super.isApplicable(MoveClass, die, pawn, board)) {
+			return false;
+		}
+
+		Board testBoard = new Board(board);
+		testBoard.movePawnForward(pawn, die.getValue());
+		List<Pawn> pawns = testBoard.getPawnsAtCoordinate(testBoard.getPawnCoordinate(pawn));
 		boolean pawnAtTargetHasSameColor = pawns.stream().anyMatch(p -> pawn.color.equals(p.color));
 
-		return super.isApplicable(MoveClass, die, pawn, board) && pawnAtTargetHasSameColor;
+		return pawnAtTargetHasSameColor;
 	}
 
 	public boolean apply(Die die, Pawn pawn, Board board) {
