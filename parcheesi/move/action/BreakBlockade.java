@@ -28,12 +28,12 @@ public class BreakBlockade extends MoveForward implements Action {
 	// NOTE: singleton.
 	public static BreakBlockade action = new BreakBlockade();
 
-	public static void main(String[] args) throws parcheesi.die.Die.InvalidDieException {
+	public static void main(String[] args) throws Die.InvalidDieException {
 		new BreakBlockadeTester();
 	}
 
 	private static class BreakBlockadeTester extends parcheesi.test.Tester {
-		public BreakBlockadeTester() throws parcheesi.die.Die.InvalidDieException {
+		public BreakBlockadeTester() throws Die.InvalidDieException {
 			Board board = new Board();
 			Pawn pawn   = new Pawn(0, parcheesi.Color.forPlayer(0).getColorName());
 			Pawn pawn2  = new Pawn(1, parcheesi.Color.forPlayer(0).getColorName());
