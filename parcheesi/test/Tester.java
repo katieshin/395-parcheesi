@@ -53,6 +53,8 @@ public class Tester {
 		System.out.println(divider);
 
 		float percentageFailed = int2float(failures) / int2float(tests);
-		System.out.println(failures + " out of " + tests + " tests failed: " + percentageFailed + "%");
+		System.out.println(
+			failures + " out of " + tests + " tests failed: " + (100 * percentageFailed) + "%"
+		);
 	}
 }
