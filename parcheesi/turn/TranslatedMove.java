@@ -66,8 +66,13 @@ class TranslatedMove {
 	private boolean isMoveFeasible(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
 		Board testBoard = new Board(board);
 
-		if (MoveClass == MoveMain.class || MoveClass == MoveHome.class) {
+		if (MoveClass == MoveMain.class) {
 			return testBoard.movePawnForward(pawn, die.getValue());
+		}
+
+		if (MoveClass == MoveHome.class) {
+			testBoard.movePawnForward(pawn, die.getValue());
+			return testBoard.inHome(pawn);
 		}
 
 		if (MoveClass == EnterPiece.class) {
@@ -78,20 +83,72 @@ class TranslatedMove {
 	}
 
 	// Assuming a Move is feasible, what modifiers apply to the Move?
-	private List<Action> getApplicableActions(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
+	private List<Action> getApplicableActions(
+			Class<? extends Move> MoveClass,
+			Die die,
+			Pawn pawn,
+			Board board
+	) {
 		return parcheesi.move.action.Manifest.ACTIONS
 			.stream()
 			.filter(a -> a.isApplicable(MoveClass, die, pawn, board))
 			.collect(Collectors.toList());
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Die.InvalidDieException {
 		new TranslatedMoveTester();
 	}
 
 	private static class TranslatedMoveTester extends parcheesi.test.Tester {
-		public TranslatedMoveTester() {
-			summarize();
+		TranslatedMove tm;
+
+		void debug(Board board) {
+			tm = new TranslatedMove(tm.die, tm.pawn, board);
+			debug();
+		}
+
+		void debug() {
+			System.out.println(tm.MoveClass);
+			System.out.println("Actions:...");
+			tm.actions.stream().forEach(
+				a -> System.out.println(a.toString().substring("parcheesi.move.action.".length()))
+			);
+			System.out.println("From die: " + tm.die.getValue());
+			System.out.println("From pawn: player " + tm.pawn.playerIndex + " id " + tm.pawn.id);
+			System.out.println("🧀 🧀 🧀");
+		}
+
+		public TranslatedMoveTester() throws Die.InvalidDieException {
+			Board board = new Board();
+			Pawn pawn   = new Pawn(0, parcheesi.Color.forPlayer(0));
+			Die die     = new parcheesi.die.NormalDie(5);
+
+			tm = new TranslatedMove(die, pawn, board);
+
+			debug();
+
+			board.addPawn(pawn);
+
+			debug(board);
+
+			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(0));
+			tm = new TranslatedMove(die, pawn2, board);
+
+			debug();
+
+			board.addPawn(pawn2);
+
+			debug(board);
+
+			Pawn otherPawn = new Pawn(0, parcheesi.Color.forPlayer(1));
+			board.addPawn(otherPawn);
+
+			board.movePawnForward(
+				pawn2,
+				parcheesi.Parameters.Board.mainRingSizePerDimension - die.getValue()
+			);
+
+			debug(board);
 		}
 	}
 }
