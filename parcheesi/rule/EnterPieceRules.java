@@ -17,7 +17,6 @@ public class EnterPieceRules implements Rule {
 		}
 
 		// NOTE: Singleton.
-		public ADieIsFive () { }
 		public static ADieIsFive rule = new ADieIsFive();
 	}
 
@@ -31,7 +30,6 @@ public class EnterPieceRules implements Rule {
 		}
 
 		// NOTE: Singleton.
-		public DiceSumToFive () { }
 		public static DiceSumToFive rule = new DiceSumToFive();
 	}
 
@@ -42,8 +40,7 @@ public class EnterPieceRules implements Rule {
 	}
 
 	// NOTE: Singleton.
-	public EnterPieceRules () { }
-	public static rule = new EnterPieceRules();
+	public static EnterPieceRules rule = new EnterPieceRules();
 
 	public static void main (String[] args) throws Die.InvalidDieException {
 		new EnterPieceTester();

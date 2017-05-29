@@ -41,7 +41,6 @@ public class MoveMainRules implements Rule {
 			return false;
 		}
 
-		public MustUseDoublesBonus() { }
 		public static MustUseDoublesBonus instance = new MustUseDoublesBonus();
 	}
 
