@@ -97,17 +97,43 @@ public class BasicXMLSerializer implements Serializer {
 
 			board.movePawnForward(pawn1, parcheesi.Parameters.Board.maxPawnTravelDistance - 2);
 
+			String player2color = parcheesi.Color.forPlayer(1).getColorName();
+			Pawn player2pawn1 = new Pawn(0, player2color);
+			Pawn player2pawn2 = new Pawn(1, player2color);
+			Pawn player2pawn3 = new Pawn(2, player2color);
+			Pawn player2pawn4 = new Pawn(3, player2color);
+
+			Pawn[] pawns2 = {
+				player2pawn1,
+				player2pawn2,
+				player2pawn3,
+				player2pawn4,
+				pawn1,
+				pawn2,
+				pawn3,
+				pawn4
+			};
+
+			board.addPawn(player2pawn1);
+			board.addPawn(player2pawn2);
+
+			board.movePawnForward(player2pawn2, parcheesi.Parameters.Board.maxPawnTravelDistance - 2 - 4);
+
 			check(
-				serializer.serialize(pawns, board).toString().equals(
+				serializer.serialize(pawns2, board).toString().equals(
 					Board().child(
 						Start().child(
+							pawnToPawnNode(player2pawn3, board),
+							pawnToPawnNode(player2pawn4, board),
 							pawnToPawnNode(pawn3, board),
 							pawnToPawnNode(pawn4, board)
 						),
 						Main().child(
+							pawnToPieceLoc(player2pawn1, board),
 							pawnToPieceLoc(pawn2, board)
 						),
 						HomeRows().child(
+							pawnToPieceLoc(player2pawn2, board),
 							pawnToPieceLoc(pawn1, board)
 						),
 						Home().child()
