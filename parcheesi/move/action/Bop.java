@@ -92,7 +92,10 @@ public class Bop implements Action {
 
 			Pawn otherPawn = new Pawn(0, parcheesi.Color.forPlayer(1).getColorName());
 			board.addPawn(otherPawn);
-			board.movePawnForward(otherPawn, parcheesi.Parameters.Board.pawnMainRingDistance - die.getValue());
+			board.movePawnForward(otherPawn,
+					(parcheesi.Parameters.Board.mainRingSizePerDimension
+						* (parcheesi.Parameters.Board.dimensions - 1))
+					- die.getValue());
 
 			check(
 				Bop.action.isApplicable(parcheesi.move.MoveMain.class, die, otherPawn, board),

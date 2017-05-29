@@ -49,11 +49,13 @@ public class Parameters {
 		public static final int entryIndexRelativeToDimensionStart = firstEntryIndex;
 		public static final int spacesLeftAfterEntry = dimensionSize - entryIndexRelativeToDimensionStart;
 
-		public static final int pawnMainRingDistance = mainRingSizePerDimension * (dimensions - 1);
+		public static final int pawnMainRingDistance
+			= mainRingSizePerDimension * (dimensions - 1)
+			+ spacesLeftAfterEntry
+			+ homeEntryIndexRelativeToDimensionStart;
+
 		public static final int maxPawnTravelDistance
-			= spacesLeftAfterEntry
-				+ pawnMainRingDistance
-				+ homeEntryIndexRelativeToDimensionStart
+			= pawnMainRingDistance
 				+ spacesPerRow; // NOTE: All other terms are obvious; this is Home Row thru to Home.
 	}
 }
