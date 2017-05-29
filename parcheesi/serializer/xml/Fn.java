@@ -23,18 +23,33 @@ class Fn {
 
 	static Node<Node> pawnToPawnNode(Pawn pawn, Board board) {
 		return Pawn().child(
-			Color().child(parcheesi.Color.Player.lookupByColorName(pawn.color)),
+			Color().child(pawn.color),
 			Id().child(pawn.id)
 		);
 	}
 
 	static Node<Node> pawnToPieceLoc(Pawn pawn, Board board) {
+		// FIXME: re-indexing is hard-coded here; should be defined by message format?
+		int playerIndex = parcheesi.Color.Player.lookupByColorName(pawn.color).ordinal();
+		int dimensionOffset = ((playerIndex + 2) % 4) * mainRingSizePerDimension;
+		int localOffset = (spacesPerRow / 2) + 1;
+		int totalOffset = dimensionOffset + localOffset;
+
+		int distance = board.pawnDistance(pawn);
+
+		int newIndex;
+
+		if (distance > pawnMainRingDistance) {
+			// NOTE: in home row
+			newIndex = distance - pawnMainRingDistance - 1;
+		} else {
+			// NOTE: in main
+			newIndex = (distance + totalOffset) % (pawnMainRingDistance + spacesPerRow/2);
+		}
+
 		return PieceLoc().child(
 			pawnToPawnNode(pawn, board),
-			Loc().child(
-				// FIXME: re-indexing is hard-coded here; should be defined by message format?
-				board.pawnDistance(pawn) + (spacesPerRow / 2)
-			)
+			Loc().child(newIndex)
 		);
 	}
 
