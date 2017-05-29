@@ -23,14 +23,14 @@ class Fn {
 
 	static Node<Node> pawnToPawnNode(Pawn pawn, Board board) {
 		return Pawn().child(
-			Color().child(pawn.color),
+			Color().child(pawn.color.getColorName()),
 			Id().child(pawn.id)
 		);
 	}
 
 	static Node<Node> pawnToPieceLoc(Pawn pawn, Board board) {
 		// FIXME: re-indexing is hard-coded here; should be defined by message format?
-		int playerIndex = parcheesi.Color.Player.lookupByColorName(pawn.color).ordinal();
+		int playerIndex = pawn.playerIndex;
 		int dimensionOffset = ((playerIndex + 2) % 4) * mainRingSizePerDimension;
 		int localOffset = (spacesPerRow / 2) + 1;
 		int totalOffset = dimensionOffset + localOffset;

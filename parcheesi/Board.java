@@ -89,7 +89,7 @@ public class Board {
 
 		@Override
 		public int next(Pawn p) {
-			if (Color.Player.lookupByColorName(p.color).equals(dimensionColor)) {
+			if (p.color.equals(dimensionColor)) {
 				// Enter the home row.
 				return index + 1;
 			} else {
@@ -192,7 +192,7 @@ public class Board {
 
 		// If a pawn has the same color as player and has a coordinate, add to pawnsNotInStart.
 		for (Pawn p : pawnCoordinates.keySet()) {
-			if (Color.Player.lookupByColorName(p.color).equals(playerColors.get(playerIndex))) {
+			if (p.color.equals(playerColors.get(playerIndex))) {
 				pawnsNotInStart.add(p.id);
 			}
 		}
@@ -249,7 +249,7 @@ public class Board {
 			return false;
 		}
 
-		int playerIndex = Color.Player.lookupByColorName(pawn.color).ordinal();
+		int playerIndex = pawn.playerIndex;
 		int playerEntryIndex = getPlayerEntryIndex(playerIndex);
 
 		setPawnCoordinate(pawn, playerEntryIndex);
@@ -268,7 +268,7 @@ public class Board {
 	}
 
 	public int pawnDistance(Pawn pawn) {
-		int playerIndex  = Color.Player.lookupByColorName(pawn.color).ordinal();
+		int playerIndex  = pawn.playerIndex;
 		int pawnStart    = getPlayerEntryIndex(playerIndex);
 		int pawnEnd      = getPawnCoordinate(pawn);
 		int distance     = 0;
@@ -471,7 +471,7 @@ public class Board {
 					// If we are on a Home space, we cannot actually have any expectedNext[Class].
 					if (location instanceof Home) {
 						// Either we should throw an Error if we try to go next() on our own Home...
-						if (location.dimensionColor.equals(Color.Player.lookupByColorName(pawn.color))) {
+						if (location.dimensionColor.equals(pawn.color)) {
 							boolean fail = false;
 							try {
 								location.next(pawn);
@@ -485,7 +485,7 @@ public class Board {
 
 					// And if we are on a different player's HomeRow, ...
 					if (location instanceof HomeRow) {
-						if (!location.dimensionColor.equals(Color.Player.lookupByColorName(pawn.color))) {
+						if (!location.dimensionColor.equals(pawn.color)) {
 							// The pawn can never reach this location.
 							continue;
 						}
@@ -508,7 +508,7 @@ public class Board {
 
 					// If this is a HomeEntry, and not our HomeEntry, ...
 					if (location instanceof HomeEntry
-							&& !location.dimensionColor.equals(Color.Player.lookupByColorName(pawn.color))) {
+							&& !location.dimensionColor.equals(pawn.color)) {
 						// We expect next to come after this player's HomeRow + Home.
 						expectedNext += (spacesPerRow - 1);
 						// And it should be of the class coming after HomeRow.class and Home.class in sequence.

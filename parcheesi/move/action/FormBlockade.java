@@ -73,7 +73,7 @@ public class FormBlockade implements Action {
 				"FormBlockade is not applicable to EnterPiece move on a pawn that already entered"
 			);
 
-			pawn.color = parcheesi.Color.forPlayer(1).getColorName();
+			pawn.color = parcheesi.Color.forPlayer(1);
 
 			check(
 				!action.isApplicable(MoveMain.class, die, pawn2, board),
