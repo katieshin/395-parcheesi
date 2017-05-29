@@ -294,7 +294,7 @@ public class Board {
 		/* NOTE: this ArrayList will need to be resized if the board is currently invalid but that's
 		 * okay. We will catch an error, if there is one, when we run the RulesChecker.
 		 */
-		List<Pawn> pawns = new ArrayList<Pawn>(parcheesi.Parameters.Board.maximumPawnOccupancy);
+		List<Pawn> pawns = new ArrayList<Pawn>(maximumPawnOccupancy);
 
 		for (Map.Entry<Pawn, Integer> coordinate : pawnCoordinates.entrySet()) {
 			if (coordinate.getValue().equals(coord)) {
