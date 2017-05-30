@@ -66,7 +66,7 @@ class TranslatedMove {
 			}
 		}
 
-		throw new IllegalStateException("No MoveClass seems to apply to this TranslatedMove");
+		throw new IllegalStateException("No MoveClass seems to apply to this (die, pawn, board) set");
 	}
 
 	// Assuming a Move is feasible, what modifiers apply to the Move?
