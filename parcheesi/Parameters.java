@@ -6,6 +6,9 @@ public class Parameters {
 	// Unlikely that we'll want to change this, but let's use a variable so that we can.
 	public static final int pawnsPerPlayer = 4;
 
+	// The die value required to enter a pawn.
+	public static final int dieValueToEnter = 5;
+
 	// Board layout/size parameters.
 	public class Board {
 		// Corresponds to number of players that can exist on the board.

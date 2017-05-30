@@ -8,7 +8,7 @@ import parcheesi.Board;
 
 public class Enter implements Action {
 	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
-		return MoveClass == EnterPiece.class;
+		return MoveClass == EnterPiece.class && die.getValue() == parcheesi.Parameters.dieValueToEnter;
 	}
 
 	public boolean apply(Die die, Pawn pawn, Board board) {

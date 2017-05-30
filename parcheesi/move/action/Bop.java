@@ -60,7 +60,7 @@ public class Bop implements Action {
 	public static class BopTester extends parcheesi.test.Tester {
 		public BopTester() throws Die.InvalidDieException {
 			Board board = new Board();
-			Die die = new parcheesi.die.NormalDie(4);
+			Die die = new parcheesi.die.NormalDie(5);
 			Pawn pawn = new Pawn(0, parcheesi.Color.forPlayer(0).getColorName());
 
 			check(
