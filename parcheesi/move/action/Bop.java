@@ -17,9 +17,7 @@ public class Bop implements Action {
 		} else if (Enter.action.isApplicable(MoveClass, die, pawn, board)) {
 			preconditionAction = Enter.action;
 		} else {
-			throw new UnsupportedOperationException(
-				"Bop action is impossible; it does not even make sense to ask if it is applicable."
-			);
+			return false;
 		}
 
 		if (!preconditionAction.apply(die, pawn, testBoard)) {
