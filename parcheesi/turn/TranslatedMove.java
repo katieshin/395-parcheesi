@@ -31,13 +31,8 @@ class TranslatedMove {
 		this.die  = die;
 		this.pawn = pawn;
 
-		List<Class<? extends Move>> possibleMoveClasses = getMoveClasses(die, pawn, board);
-		if (possibleMoveClasses.size() != 1) {
-			throw new IllegalStateException("A TranslatedMove somehow has more than 1 MoveClass");
-		}
-
-		this.MoveClass = possibleMoveClasses.get(0);
-		this.actions   = getApplicableActions(MoveClass, die, pawn, board);
+		this.MoveClass = getMoveClass(die, pawn, board);
+		this.actions   = getApplicableActions(this.MoveClass, die, pawn, board);
 	}
 
 	/**
@@ -57,29 +52,21 @@ class TranslatedMove {
 		return resultBoard;
 	}
 
-	private List<Class<? extends Move>> getMoveClasses(Die die, Pawn pawn, Board board) {
-		return parcheesi.move.Manifest.MOVE_CLASSES.stream()
-			.filter(MoveClass -> isMoveFeasible(MoveClass, die, pawn, board))
-			.collect(Collectors.toList());
-	}
-
-	private boolean isMoveFeasible(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
+	private Class<? extends Move> getMoveClass(Die die, Pawn pawn, Board board)
+		throws IllegalStateException {
 		Board testBoard = new Board(board);
 
-		if (MoveClass == MoveMain.class) {
-			return testBoard.movePawnForward(pawn, die.getValue());
+		if (testBoard.addPawn(pawn)) {
+			return EnterPiece.class;
+		} else if (testBoard.movePawnForward(pawn, die.getValue())) {
+			if (testBoard.inHome(pawn)) {
+				return MoveHome.class;
+			} else {
+				return MoveMain.class;
+			}
 		}
 
-		if (MoveClass == MoveHome.class) {
-			testBoard.movePawnForward(pawn, die.getValue());
-			return testBoard.inHome(pawn);
-		}
-
-		if (MoveClass == EnterPiece.class) {
-			return testBoard.addPawn(pawn);
-		}
-
-		return false;
+		throw new IllegalStateException("No MoveClass seems to apply to this TranslatedMove");
 	}
 
 	// Assuming a Move is feasible, what modifiers apply to the Move?
