@@ -18,6 +18,7 @@ class TranslatedMove {
 	private List<Action> actions;
 	private Die die;
 	private Pawn pawn;
+	private Board board;
 
 	/**
 	 * Create the complete move encapsulating all of the Actions taken by some Pawn on some Board
@@ -28,8 +29,9 @@ class TranslatedMove {
 	 * @param board The Board on which the Pawn moves
 	 */
 	public TranslatedMove(Die die, Pawn pawn, Board board) throws IllegalStateException {
-		this.die  = die;
-		this.pawn = pawn;
+		this.die   = die;
+		this.pawn  = pawn;
+		this.board = board;
 
 		this.MoveClass = getMoveClass(die, pawn, board);
 		this.actions   = getApplicableActions(this.MoveClass, die, pawn, board);
@@ -42,7 +44,13 @@ class TranslatedMove {
 	 * @param board Board to copy and update
 	 * @return Board resulting from applying every Action to take for this TranslatedMove
 	 */
-	public Board take(Board board) {
+	public Board take(Board board) throws UnsupportedOperationException {
+		if (this.board != board) {
+			throw new UnsupportedOperationException(
+				"Cannot take move on board different from board for which move was generated"
+			);
+		}
+
 		Board resultBoard = new Board(board);
 
 		for (Action action : actions) {
@@ -56,14 +64,12 @@ class TranslatedMove {
 		throws IllegalStateException {
 		Board testBoard = new Board(board);
 
-		if (testBoard.addPawn(pawn)) {
+		if (testBoard.inNest(pawn)) {
 			return EnterPiece.class;
-		} else if (testBoard.movePawnForward(pawn, die.getValue())) {
-			if (testBoard.inHome(pawn)) {
-				return MoveHome.class;
-			} else {
-				return MoveMain.class;
-			}
+		} else if (testBoard.inHomeRow(pawn)) {
+			return MoveHome.class;
+		} else if (testBoard.inMain(pawn)) {
+			return MoveMain.class;
 		}
 
 		throw new IllegalStateException("No MoveClass seems to apply to this (die, pawn, board) set");
@@ -89,11 +95,6 @@ class TranslatedMove {
 	private static class TranslatedMoveTester extends parcheesi.test.Tester {
 		TranslatedMove tm;
 
-		void debug(Board board) {
-			tm = new TranslatedMove(tm.die, tm.pawn, board);
-			debug();
-		}
-
 		void debug() {
 			System.out.println(tm.MoveClass);
 			System.out.println("Actions:...");
@@ -114,9 +115,11 @@ class TranslatedMove {
 
 			debug();
 
-			board.addPawn(pawn);
+			// board.addPawn(pawn);
+			tm.take(board);
 
-			debug(board);
+			tm = new TranslatedMove(tm.die, tm.pawn, board);
+			debug();
 
 			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(0));
 			tm = new TranslatedMove(die, pawn2, board);
@@ -125,7 +128,8 @@ class TranslatedMove {
 
 			board.addPawn(pawn2);
 
-			debug(board);
+			tm = new TranslatedMove(tm.die, tm.pawn, board);
+			debug();
 
 			Pawn otherPawn = new Pawn(0, parcheesi.Color.forPlayer(1));
 			board.addPawn(otherPawn);
@@ -135,7 +139,9 @@ class TranslatedMove {
 				parcheesi.Parameters.Board.mainRingSizePerDimension - die.getValue()
 			);
 
-			debug(board);
+			// FIXME: this should not be generating a move forward because it's an occupied safe space
+			tm = new TranslatedMove(tm.die, tm.pawn, board);
+			debug();
 		}
 	}
 }
