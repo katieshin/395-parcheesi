@@ -104,15 +104,19 @@ public class Board {
 	}
 
 	public boolean inHome(Pawn p) {
-		return this.pawnDistance(p) == (maxPawnTravelDistance - 1);
+		return locations[this.getPawnCoordinate(p)] instanceof Home;
 	}
 
 	public boolean inHomeRow(Pawn p) {
-		return !this.inHome(p) && this.pawnDistance(p) > pawnMainRingDistance;
+		return locations[this.getPawnCoordinate(p)] instanceof HomeRow;
 	}
 
 	public boolean inMain(Pawn p) {
 		return !(this.inStart(p) || this.inHome(p) || this.inHomeRow(p));
+	}
+
+	public boolean isSafe(Pawn p) {
+		return locations[this.getPawnCoordinate(p)] instanceof Safe;
 	}
 
 	// Board spaces/locations.
