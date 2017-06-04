@@ -31,14 +31,16 @@ public class Parameters {
 		/* Corresponds to the distance between two nodes of alike type and same relative
 		 * position in adjacent dimensions.
 		 *   e.g.: dist(Entry in dimension 2, Entry in dimension 1) = dimensionSize
+		 *
+		 * NOTE: The plus 1 is to accommodate the home row, which goes 1 space farther in the middle.
 		 */
-		public static final int dimensionSize = spacesPerRow * rowsPerDimension;
+		public static final int dimensionSize = spacesPerRow * rowsPerDimension + 1;
 
 		/* Corresponds to the distance between two nodes of alike type in two different dimensions,
 		 * not counting the home row (i.e.; main ring distance, so the distance pawns travel).
 		 *   e.g.: dist(Entry 1, Entry 2) for Player 1 Pawn = mainRingSizePerDimension
 		 */
-		public static final int mainRingSizePerDimension = dimensionSize - (spacesPerRow - 1);
+		public static final int mainRingSizePerDimension = dimensionSize - spacesPerRow;
 
 		public static final int size = dimensionSize * dimensions;
 
@@ -47,13 +49,19 @@ public class Parameters {
 		// FIXME?: These calculations don't work correctly if rowsPerDimension is even.
 		public static final int firstSafeIndex      = spacesPerRow / 2 - 1;
 		public static final int firstHomeEntryIndex = spacesPerRow;
-		public static final int firstEntryIndex     = firstHomeEntryIndex + spacesPerRow + (spacesPerRow / 2);
+		public static final int firstEntryIndex =
+			firstHomeEntryIndex
+			// HomeRow and Home
+			+ spacesPerRow + 1
+			// Preceding Neutrals
+			+ (spacesPerRow / 2);
 
 		// Convenient aliases that have more meaning.
 		public static final int safeIndexRelativeToDimensionStart = firstSafeIndex;
 		public static final int homeEntryIndexRelativeToDimensionStart = firstHomeEntryIndex;
 		public static final int entryIndexRelativeToDimensionStart = firstEntryIndex;
-		public static final int spacesLeftAfterEntry = dimensionSize - entryIndexRelativeToDimensionStart;
+		public static final int spacesLeftAfterEntry =
+			dimensionSize - entryIndexRelativeToDimensionStart;
 
 		public static final int pawnMainRingDistance
 			= mainRingSizePerDimension * (dimensions - 1)

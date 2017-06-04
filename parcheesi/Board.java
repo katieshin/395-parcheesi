@@ -94,7 +94,7 @@ public class Board {
 				return index + 1;
 			} else {
 				// Skip the home row.
-				return index + spacesPerRow;
+				return index + spacesPerRow + 1;
 			}
 		}
 	}
@@ -166,7 +166,7 @@ public class Board {
 				locations[i] = new HomeEntry(i);
 				// Insert Home row.
 				int homeEntryIndex = i;
-				for (i = homeEntryIndex + 1; i < homeEntryIndex + (spacesPerRow - 1); i++) {
+				for (i = homeEntryIndex + 1; i < homeEntryIndex + spacesPerRow; i++) {
 					locations[i] = new HomeRow(i);
 				}
 				// Insert Home.
@@ -397,14 +397,14 @@ public class Board {
 				"There are " + dimensions + " Home locations"
 			);
 
-			int expectedNumHomeRowSpaces = dimensions * (spacesPerRow - 2);
+			int expectedNumHomeRowSpaces = dimensions * (spacesPerRow - 1);
 			check(
 				// spacesPerRow - 1 for Home, -1 for HomeEntry = spacesPerRow - 2
 				numHomeRowSpaces == expectedNumHomeRowSpaces,
 				"There are " + expectedNumHomeRowSpaces + " HomeRow spaces"
 			);
 
-			int expectedNumSafeSpaces = dimensions * (4 + (spacesPerRow - 2));
+			int expectedNumSafeSpaces = dimensions * (4 + (spacesPerRow - 1));
 			check(
 				numSafeSpaces == expectedNumSafeSpaces,
 				"There are " + expectedNumSafeSpaces + " Safe spaces:"
@@ -423,7 +423,7 @@ public class Board {
 				1,                      // Safe
 				spacesPerRow / 2,       // Neutral
 				1,                      // HomeEntry
-				spacesPerRow - 2,       // HomeRow
+				spacesPerRow - 1,       // HomeRow
 				1,                      // Home
 				spacesPerRow / 2,       // Neutral
 				1,                      // Entry
@@ -517,7 +517,7 @@ public class Board {
 					if (location instanceof HomeEntry
 							&& !location.dimensionColor.equals(pawn.color)) {
 						// We expect next to come after this player's HomeRow + Home.
-						expectedNext += (spacesPerRow - 1);
+						expectedNext += spacesPerRow;
 						// And it should be of the class coming after HomeRow.class and Home.class in sequence.
 						expectedNextClass = classes[(iteration + 3) % classes.length];
 					}
@@ -534,7 +534,7 @@ public class Board {
 					check(
 						expectedNextClass.isInstance(nextLocation),
 						"The nextLocation is an instance of the correct class @ " + expectedNext + ", that is: "
-						+ expectedNextClass.getSimpleName()
+						+ expectedNextClass.getSimpleName() + " == given: " + nextLocation.getClass().getSimpleName()
 					);
 				}
 			}
@@ -678,14 +678,16 @@ public class Board {
 		void movePawnForward() {
 			Board board = new Board();
 			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
+
 			board.addPawn(pawn);
+
 			check(
 				board.movePawnForward(pawn, 1),
 				"Moving a pawn forward 1 from Entry should succeed"
 			);
 
 			// Count of spaces from player Entry to player HomeEntry
-			int spacesToHomeEntry = spacesLeftAfterEntry
+			int spacesToHomeEntry = (spacesLeftAfterEntry - 1)
 				+ mainRingSizePerDimension * (dimensions - 1)
 				+ homeEntryIndexRelativeToDimensionStart;
 			check(
@@ -694,12 +696,12 @@ public class Board {
 			);
 
 			check(
-				!board.movePawnForward(pawn, (spacesPerRow - 1)),
+				!board.movePawnForward(pawn, spacesPerRow + 1),
 				"Moving a pawn past Home should fail (1)"
 			);
 
 			check(
-				board.movePawnForward(pawn, (spacesPerRow - 1) - 1),
+				board.movePawnForward(pawn, spacesPerRow),
 				"Moving a pawn to Home should succeed"
 			);
 
@@ -833,7 +835,7 @@ public class Board {
 				"A pawn that is on a safe space is in safe"
 			);
 
-			board.movePawnForward(p, maxPawnTravelDistance - 1);
+			board.movePawnForward(p, maxPawnTravelDistance);
 
 			check(
 				board.inHome(p),
