@@ -8,7 +8,9 @@ import parcheesi.Board;
 
 public class Enter implements Action {
 	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
-		return MoveClass == EnterPiece.class && die.getValue() == parcheesi.Parameters.dieValueToEnter;
+		return MoveClass == EnterPiece.class
+			&& die.getValue() == parcheesi.Parameters.dieValueToEnter
+			&& (new Board(board)).addPawn(pawn);
 	}
 
 	public boolean apply(Die die, Pawn pawn, Board board) {
@@ -24,13 +26,9 @@ public class Enter implements Action {
 
 	public static class EnterTester extends parcheesi.test.Tester {
 		public EnterTester() throws Die.InvalidDieException {
+			Die die     = new parcheesi.die.NormalDie(parcheesi.Parameters.dieValueToEnter);
+			Pawn pawn1  = new Pawn(0, parcheesi.Color.forPlayer(0).getColorName());
 			Board board = new Board();
-
-			// NOTE: This die roll is purposefully invalid for an EnterPiece move.
-			Die die = new parcheesi.die.NormalDie(5);
-
-			// NOTE: This set of added Pawns is purposefully chosen to be invalid.
-			Pawn pawn1 = new Pawn(0, parcheesi.Color.forPlayer(0).getColorName());
 
 			check(
 				Enter.action.isApplicable(EnterPiece.class, die, pawn1, board),
@@ -42,35 +40,27 @@ public class Enter implements Action {
 				"Taking Enter move action succeeds for valid EnterPiece conditions"
 			);
 
-			board = new Board();
-			die = new parcheesi.die.NormalDie(1);
+			die = new parcheesi.die.NormalDie(((parcheesi.Parameters.dieValueToEnter - 2) % 6) + 1);
 
 			check(
-				Enter.action.isApplicable(EnterPiece.class, die, pawn1, board),
-				"Enter move action is applicable even if it breaks the rules of EnterPiece"
-			);
-
-			check(
-				Enter.action.apply(die, pawn1, board),
-				"Taking Enter move action succeeds even if it breaks the rules of EnterPiece"
+				!Enter.action.isApplicable(EnterPiece.class, die, pawn1, board),
+				"Enter move action is not applicable if the pawn is already entered"
 			);
 
 			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(0).getColorName());
-			Pawn pawn3 = new Pawn(2, parcheesi.Color.forPlayer(0).getColorName());
-			Pawn pawn4 = new Pawn(3, parcheesi.Color.forPlayer(0).getColorName());
-
-			board.addPawn(pawn2);
-			board.addPawn(pawn3);
-			board.addPawn(pawn4);
 
 			check(
-				Enter.action.isApplicable(EnterPiece.class, die, pawn1, board),
-				"Enter move action is applicable even if the resulting Board is broke AF"
+				!Enter.action.isApplicable(EnterPiece.class, die, pawn2, board),
+				"Enter move action is not applicable for unentered pawn with incorrect die value"
 			);
 
+			Pawn pawn3 = new Pawn(2, parcheesi.Color.forPlayer(0).getColorName());
+
+			board.addPawn(pawn2);
+
 			check(
-				!Enter.action.apply(die, pawn1, board),
-				"But you cannot take Enter move action if the resulting Board would be broke AF"
+				!Enter.action.isApplicable(EnterPiece.class, die, pawn3, board),
+				"Enter action is not applicable if there's a blockade on entry"
 			);
 
 			summarize();

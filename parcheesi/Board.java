@@ -275,6 +275,10 @@ public class Board {
 		int playerIndex = pawn.playerIndex;
 		int playerEntryIndex = getPlayerEntryIndex(playerIndex);
 
+		if (isBlockade(playerEntryIndex)) {
+			return false;
+		}
+
 		setPawnCoordinate(pawn, playerEntryIndex);
 
 		return true;
