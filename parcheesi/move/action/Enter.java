@@ -70,7 +70,7 @@ public class Enter implements Action {
 
 			check(
 				!Enter.action.apply(die, pawn1, board),
-				"Cannot take Enter move action if the resulting Board would be broke AF"
+				"But you cannot take Enter move action if the resulting Board would be broke AF"
 			);
 
 			summarize();
