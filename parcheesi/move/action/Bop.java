@@ -1,6 +1,7 @@
 package parcheesi.move.action;
 
 import java.util.List;
+import java.util.Optional;
 
 import parcheesi.move.Move;
 import parcheesi.pawn.Pawn;
@@ -8,44 +9,44 @@ import parcheesi.die.Die;
 import parcheesi.Board;
 
 public class Bop implements Action {
+	private static class BopEnter extends Enter {
+		public static BopEnter action = new BopEnter();
+	}
+
+	private static class BopMoveForward extends MoveForward {
+		public static BopMoveForward action = new BopMoveForward();
+	}
+
 	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
 		Board testBoard = new Board(board);
-		Action preconditionAction;
 
-		if (MoveForward.action.isApplicable(MoveClass, die, pawn, board)) {
-			preconditionAction = MoveForward.action;
-		} else if (Enter.action.isApplicable(MoveClass, die, pawn, board)) {
-			preconditionAction = Enter.action;
-		} else {
-			return false;
+		if (BopEnter.action.isApplicable(MoveClass, die, pawn, testBoard)) {
+			return BopEnter.action.apply(die, pawn, testBoard)
+				&& findBopTarget(pawn, testBoard).isPresent();
+		} else if (BopMoveForward.action.isApplicable(MoveClass, die, pawn, testBoard)) {
+			if (BopMoveForward.action.apply(die, pawn, testBoard)) {
+				Optional<Pawn> bopTarget = findBopTarget(pawn, testBoard);
+				return bopTarget.isPresent() && !board.isSafe(bopTarget.get());
+			}
 		}
 
-		if (!preconditionAction.apply(die, pawn, testBoard)) {
-			return false;
-		}
-
-		int coord = testBoard.getPawnCoordinate(pawn);
-		List<Pawn> pawns = testBoard.getPawnsAtCoordinate(coord);
-
-		// If there's any pawn of a different color here, return true.
-		return pawns.stream().anyMatch(p -> !pawn.color.equals(p.color));
-
-		// TODO?:
-		// return BopMoveRules.applicable(die, pawn, board);
+		return false;
 	}
 
 	public boolean apply(Die die, Pawn pawn, Board board) {
-		int coord = board.getPawnCoordinate(pawn);
+		// Pre: Bop.isApplicable(...) -> true
+		// TODO: add a bonus to the turn.
+		return board.removePawn(findBopTarget(pawn, board).get());
+	}
+
+	private Optional<Pawn> findBopTarget(Pawn bopper, Board board) {
+		int coord = board.getPawnCoordinate(bopper);
 		List<Pawn> pawns = board.getPawnsAtCoordinate(coord);
 
-		// FIXME use BopPenalty.action here?
-		Pawn bopped = pawns.stream()
-			.filter(p -> !pawn.color.equals(p.color))
-			.findFirst()
-			.get();
-
-		// TODO: add a bonus to the turn.
-		return board.removePawn(bopped);
+		return pawns
+			.stream()
+			.filter(p -> !bopper.color.equals(p.color))
+			.findFirst();
 	}
 
 	// NOTE: Singleton.
@@ -90,27 +91,32 @@ public class Bop implements Action {
 
 			Pawn otherPawn = new Pawn(0, parcheesi.Color.forPlayer(1).getColorName());
 			board.addPawn(otherPawn);
+			// Move otherPawn onto player 0 dimension.
 			board.movePawnForward(otherPawn,
 					(parcheesi.Parameters.Board.mainRingSizePerDimension
 						* (parcheesi.Parameters.Board.dimensions - 1))
 					- die.getValue());
 
 			check(
-				Bop.action.isApplicable(parcheesi.move.MoveMain.class, die, otherPawn, board),
-				"Bop is applicable when other-colored pawn is at destination"
+				!Bop.action.isApplicable(parcheesi.move.MoveMain.class, die, otherPawn, board),
+				"Bop is not applicable when other-colored pawn is at destination but destination is safe"
 			);
 
+			// NOTE: move pawn off of Entry, because it's safe.
+			board.movePawnForward(pawn, 1);
+
+			// Move otherPawn onto player 0 entry
 			board.movePawnForward(otherPawn, die.getValue());
 
 			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(0).getColorName());
 			check(
-				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn, board),
-				"Bop is not applicable for EnterPiece if Enter action fails"
+				Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn2, board),
+				"Bop is applicable for EnterPiece where other colored pawn occupies Entry"
 			);
 
 			check(
-				Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn2, board),
-				"Bop is applicable for EnterPiece where other colored pawn occupies Entry"
+				!Bop.action.isApplicable(parcheesi.move.EnterPiece.class, die, pawn, board),
+				"Bop is not applicable for EnterPiece if Enter action fails"
 			);
 
 			summarize();
