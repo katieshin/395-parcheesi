@@ -204,26 +204,6 @@ public class Board {
 		return equal;
 	}
 
-	public ArrayList<Integer> getPlayerPawnIndicesInStart(int playerIndex) {
-		ArrayList<Integer> pawnsNotInStart = new ArrayList<Integer>();
-
-		// If a pawn has the same color as player and has a coordinate, add to pawnsNotInStart.
-		for (Pawn p : pawnCoordinates.keySet()) {
-			if (p.color.equals(playerColors.get(playerIndex))) {
-				pawnsNotInStart.add(p.id);
-			}
-		}
-
-		int numberOfPawnsInStart = pawnsPerPlayer - pawnsNotInStart.size();
-		ArrayList<Integer> pawnsInStart = new ArrayList<Integer>(numberOfPawnsInStart);
-
-		for (int i = 0; i < pawnsPerPlayer; i++) {
-			if (!pawnsNotInStart.contains(i)) pawnsInStart.add(i);
-		}
-
-		return pawnsInStart;
-	}
-
 	private int getPlayerEntryIndex(int playerIndex) {
 		return firstEntryIndex + (dimensionSize * playerIndex);
 	}
@@ -343,7 +323,6 @@ public class Board {
 			getPlayerEntryIndex();
 			addPawn();
 			removePawn();
-			playerPawnIndicesInStart();
 			movePawnForward();
 			pawnDistance();
 			boardEquality();
@@ -695,43 +674,6 @@ public class Board {
 			);
 		}
 	}
-
-		void playerPawnIndicesInStart() {
-			Board board = new Board();
-
-			for (int i = 0; i < dimensions; i++) {
-				check(
-					board.getPlayerPawnIndicesInStart(0).size() == pawnsPerPlayer,
-					"All pawns of a player who has added no pawns to the board will be in start ("
-					+ (i + 1) + ")"
-				);
-			}
-
-			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
-
-			board.addPawn(pawn);
-
-			ArrayList<Integer> expectedPawnsInStart = new ArrayList<Integer>(pawnsPerPlayer - 1);
-			for (int i = 1; i < pawnsPerPlayer; i++) expectedPawnsInStart.add(i);
-
-			check(
-				board.getPlayerPawnIndicesInStart(0).containsAll(expectedPawnsInStart),
-				"If a player has entered only Pawn 0, then all other Pawn ids { 1, ... } are still in start"
-			);
-
-			Pawn pawn2 = new Pawn(1, Color.forPlayer(0).getColorName());
-			Pawn pawn3 = new Pawn(2, Color.forPlayer(0).getColorName());
-			Pawn pawn4 = new Pawn(3, Color.forPlayer(0).getColorName());
-
-			board.addPawn(pawn2);
-			board.addPawn(pawn3);
-			board.addPawn(pawn4);
-
-			check(
-				board.getPlayerPawnIndicesInStart(0).size() == 0,
-				"If a player has entered all their pawns, then no pawns are still in start"
-			);
-		}
 
 		void movePawnForward() {
 			Board board = new Board();
