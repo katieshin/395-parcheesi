@@ -4,10 +4,13 @@ Aiming to have a working player for the tournament on Monday.
 
 * Working client for a (given) working server
   * Stuff that we don't have to worry about (yet)
-    * MoveMain: BopBonus + Regular Die
-* Add actual Home space to Board
+    * MoveMain of: BopBonus + Regular Die combination
+* ~~Add actual Home space to Board~~
+* EnterHome action
 * Complete Turn & TranslatedMove implementations
-  * Refactor Rules so that TranslatedMove can use them
+  * ~~Refactor Rules so that TranslatedMove can use them~~ (Sort of.)
+  * Add tests
+  * Add dice to a turn as a result of actions
 * Player implementations
   * TournamentPlayer (NetworkPlayer)
   * Everything else is more-or-less a waste of time / bonus at this point
