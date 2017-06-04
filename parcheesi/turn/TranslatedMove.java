@@ -108,39 +108,32 @@ class TranslatedMove {
 
 		public TranslatedMoveTester() throws Die.InvalidDieException {
 			Board board = new Board();
-			Pawn pawn   = new Pawn(0, parcheesi.Color.forPlayer(0));
+			Pawn pawn   = new Pawn(0, parcheesi.Color.forPlayer(1));
 			Die die     = new parcheesi.die.NormalDie(5);
 
 			tm = new TranslatedMove(die, pawn, board);
-
 			debug();
-
-			// board.addPawn(pawn);
-			tm.take(board);
+			board = tm.take(board);
 
 			tm = new TranslatedMove(tm.die, tm.pawn, board);
 			debug();
 
-			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(0));
+			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(1));
 			tm = new TranslatedMove(die, pawn2, board);
-
 			debug();
+			board = tm.take(board);
 
-			board.addPawn(pawn2);
-
-			tm = new TranslatedMove(tm.die, tm.pawn, board);
+			Pawn otherPawn = new Pawn(0, parcheesi.Color.forPlayer(0));
+			tm = new TranslatedMove(die, otherPawn, board);
 			debug();
-
-			Pawn otherPawn = new Pawn(0, parcheesi.Color.forPlayer(1));
-			board.addPawn(otherPawn);
+			board = tm.take(board);
 
 			board.movePawnForward(
-				pawn2,
+				otherPawn,
 				parcheesi.Parameters.Board.mainRingSizePerDimension - die.getValue()
 			);
 
-			// FIXME: this should not be generating a move forward because it's an occupied safe space
-			tm = new TranslatedMove(tm.die, tm.pawn, board);
+			tm = new TranslatedMove(die, otherPawn, board);
 			debug();
 		}
 	}
