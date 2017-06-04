@@ -15,6 +15,9 @@ public class Parameters {
 		public static final int dimensions = maxPlayers;
 		// NOTE: If dimension changes, renderer will need to be able to handle it.
 
+		// Number of pawns in a blockade.
+		public static final int pawnsToFormBlockade = 2;
+
 		// How many pawns can share a single location?
 		public static final int maximumPawnOccupancy = 2;
 

@@ -74,7 +74,7 @@ class Fn {
 					pawnToChildMapper(homeRowsNode, withBoard(board, Fn::pawnToPieceLoc))
 				);
 				put(
-					board::inStart,
+					board::inNest,
 					pawnToChildMapper(startNode, withBoard(board, Fn::pawnToPawnNode))
 				);
 				put(

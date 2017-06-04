@@ -26,7 +26,7 @@ public class Bop implements Action {
 		} else if (BopMoveForward.action.isApplicable(MoveClass, die, pawn, testBoard)) {
 			if (BopMoveForward.action.apply(die, pawn, testBoard)) {
 				Optional<Pawn> bopTarget = findBopTarget(pawn, testBoard);
-				return bopTarget.isPresent() && !board.isSafe(bopTarget.get());
+				return bopTarget.isPresent() && !board.inSafe(bopTarget.get());
 			}
 		}
 

@@ -99,7 +99,7 @@ public class Board {
 		}
 	}
 
-	public boolean inStart(Pawn p) {
+	public boolean inNest(Pawn p) {
 		return this.getPawnCoordinate(p) == -1;
 	}
 
@@ -112,11 +112,24 @@ public class Board {
 	}
 
 	public boolean inMain(Pawn p) {
-		return !(this.inStart(p) || this.inHome(p) || this.inHomeRow(p));
+		return !(this.inNest(p) || this.inHome(p) || this.inHomeRow(p));
 	}
 
-	public boolean isSafe(Pawn p) {
+	public boolean inSafe(Pawn p) {
 		return locations[this.getPawnCoordinate(p)] instanceof Safe;
+	}
+
+	public boolean isBlockade(int coord) {
+		/* Precondition: pawnCoordinates are valid. (i.e., no exceeding occupancy, no pairs of different
+		 * colors, no illegal coordinates, so on.)
+		 */
+		/* NOTE: <= gives slightly more flexibility in the case that maximumPawnOccupancy is more than
+		 * the pawnsToFormBlockade; it would make for a weird game of parcheesi, but sure.
+		 */
+		return pawnsToFormBlockade <= pawnCoordinates.entrySet()
+			.stream()
+			.filter((entry) -> entry.getValue() == coord)
+			.count();
 	}
 
 	// Board spaces/locations.
@@ -240,7 +253,13 @@ public class Board {
 			if (currentLocation instanceof Home) {
 				return false;
 			}
-			currentLocation = locations[currentLocation.next(pawn)];
+
+			int nextCoordinate = currentLocation.next(pawn);
+			if (isBlockade(nextCoordinate)) {
+				return false;
+			}
+
+			currentLocation = locations[nextCoordinate];
 		}
 
 		setPawnCoordinate(pawn, currentLocation.index);
@@ -325,6 +344,7 @@ public class Board {
 			pawnDistance();
 			boardEquality();
 			getPawnsAtCoordinate();
+			flagTests();
 
 			summarize();
 		}
@@ -836,6 +856,42 @@ public class Board {
 				pawns.size() == 2 && pawns.contains(pawn) && pawns.contains(sameColorPawn),
 				"After moving two pawns of the same color separately to the same location, there are still"
 				+ " two pawns at that new pawn coordinate"
+			);
+		}
+
+		void flagTests() {
+			Board board = new Board();
+			Pawn p = new Pawn(0, Color.forPlayer(0));
+
+			check(
+				board.inNest(p),
+				"A pawn that isn't on the board is in the nest"
+			);
+
+			board.addPawn(p);
+			Pawn p2 = new Pawn(1, Color.forPlayer(0));
+			board.addPawn(p2);
+
+			check(
+				board.isBlockade(board.getPawnCoordinate(p)),
+				"A coordinate with 2 pawns on it is a blockade"
+			);
+
+			check(
+				board.inMain(p),
+				"A pawn that has entered the board is in main"
+			);
+
+			check(
+				board.inSafe(p),
+				"A pawn that is on a safe space is in safe"
+			);
+
+			board.movePawnForward(p, maxPawnTravelDistance - 1);
+
+			check(
+				board.inHome(p),
+				"A pawn that has reached home is in home"
 			);
 		}
 	}
