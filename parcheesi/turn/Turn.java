@@ -20,6 +20,8 @@ public class Turn {
 	List<Die> diceUsed;
 	// Moves allowed given the current dice.
 	List<TranslatedMove> movesAvailable;
+	// Possible end board stated allowed given the current dice.
+	List<Board> nextBoardsAvailable;
 	// Moves that have been taken so far. (Corresponding to some die.)
 	List<TranslatedMove> movesTaken;
 	// Player taking the turn.
@@ -29,16 +31,18 @@ public class Turn {
 	// Board in progress.
 	Board resultBoard;
 
-	public Turn(Player player, Board startBoard, List<Die> startingDice) {
-		int startingDiceCount = startingDice.size();
+
+	public Turn(Player player, Board startBoard, Die[] startingDice) {
+		int startingDiceCount = startingDice.length;
 
 		this.player = player;
 		this.startBoard = startBoard;
 		this.resultBoard = startBoard;
 
-		this.diceAvailable    = new ArrayList<Die>(startingDice);
+		this.diceAvailable    = new ArrayList<Die>(Arrays.asList(startingDice));
 		this.diceCombinations = generateDiceCombinations(diceAvailable);
 		this.movesAvailable   = generateMovesAvailable(diceCombinations, startBoard);
+		this.nextBoardsAvailable = generateNextMovesAvailable(this.movesAvailable, startBoard);
 
 		this.diceUsed   = new ArrayList<Die>(diceAvailable.size());
 		this.movesTaken = new ArrayList<TranslatedMove>(movesAvailable.size());
@@ -66,6 +70,14 @@ public class Turn {
 	public List<TranslatedMove> movesAvailable() {
 		return movesAvailable;
 	}
+	public Board resultBoard() {
+		return resultBoard;
+	}
+	public List<TranslatedMove> nextBoardsAvailable() {
+		return nextBoardsAvailable;
+	}
+
+
 
 	// public void addDie(Die d) {
 	// 	diceAvailable.add(d);
@@ -85,6 +97,15 @@ public class Turn {
 			for (Die die : dice) {
 				moves.add(new TranslatedMove(die, pawn, board));
 			}
+		}
+
+		return moves.stream().filter((m) -> !m.isNoop()).collect(Collectors.toList());
+	}
+	List<TranslatedMove> generateNextMovesAvailable(List<TranslatedMove> moves, Board startBoard) {
+		List<Board> boards = new ArrayList<Board>();
+
+		for (TranslatedMove move : moves) {
+			boards.add(move.take(startBoard));
 		}
 
 		return moves.stream().filter((m) -> !m.isNoop()).collect(Collectors.toList());
@@ -117,12 +138,12 @@ public class Turn {
 
 	public static void main(String[] args) throws Die.InvalidDieException {
 		Board board = new Board();
-		Turn t = new Turn(new parcheesi.player.StubPlayer(0), board, Arrays.asList(
+		Turn t = new Turn(new parcheesi.player.StubPlayer(0), board, new Die[] {
 			new parcheesi.die.NormalDie(5),
 			new parcheesi.die.NormalDie(5),
 			new parcheesi.die.NormalDie(2),
 			new parcheesi.die.NormalDie(2)
-		));
+		});
 
 		System.out.println(t.diceCombinations.size() == (4 + 12 + 24 + 24));
 
