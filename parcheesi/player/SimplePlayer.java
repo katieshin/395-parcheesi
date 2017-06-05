@@ -17,6 +17,8 @@ public class SimplePlayer implements Player {
 
 	public Move[] doMove(Board board, int[] dice) {
 		// TODO
+		Turn myTurn = new Turn(this, board, dice);
+
 		return new Move[] {};
 	}
 
