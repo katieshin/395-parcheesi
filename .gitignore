@@ -1,1 +1,8 @@
 *.class
+
+/weld-3.0.0.Final/*
+!/weld-3.0.0.Final/artifacts/
+/weld-3.0.0.Final/artifacts/*
+!/weld-3.0.0.Final/artifacts/weld
+/weld-3.0.0.Final/artifacts/weld/*
+!/weld-3.0.0.Final/artifacts/weld/weld-se-shaded.jar

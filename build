@@ -5,15 +5,18 @@ working_dir=$(pwd)
 
 pushd $git_project_root > /dev/null
 
+export CLASSPATH="$CLASSPATH:$git_project_root/weld-3.0.0.Final/artifacts/weld/weld-se-shaded.jar"
+
 for f in $*
 do
   absolute_path="$working_dir/`echo $f | sed -e 's/\.\///g'`"
   package_path=`echo $absolute_path | sed -e "s#^$git_project_root/##"`
 
-  javac $package_path \
+  javac -parameters $package_path \
     && java `echo $package_path | sed -e 's/^\.\///' | sed -e 's/\.java$//' | tr '/' '.'`
 done
 
-$git_project_root/clean
+$git_project_root/clean parcheesi
+$git_project_root/clean bugzapper
 
 popd > /dev/null

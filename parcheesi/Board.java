@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 
+import bugzapper.Contractual;
+import bugzapper.Precondition;
+import bugzapper.Postcondition;
+
 import static parcheesi.Parameters.Board.*;
 import static parcheesi.Parameters.pawnsPerPlayer;
 
@@ -15,6 +19,7 @@ import parcheesi.pawn.Pawn;
 import parcheesi.move.Move;
 import parcheesi.Color;
 
+@Contractual
 public class Board {
 	// TODO: Refactor into parchessi.board.Board and parcheesi.board.Location.{...} (clean up).
 	abstract class Location {
@@ -119,10 +124,20 @@ public class Board {
 		return locations[this.getPawnCoordinate(p)] instanceof Safe;
 	}
 
+	// JavaScript strings are contracts now.
+	// Arguments are automatically injected into the script engine instance
+	// Parameters is autoinjected as a matter of convenience
+	@Precondition(
+		"coord >= 0"
+		+ " && coord < Parameters.Board.size"
+		+ " && self.getPawnsAtCoordinate(coord).length >= 1"
+	)
+	// "result" is a special alias for the output after invoking the function
+	@Postcondition(
+		"result >= 0"
+		+ " && result <= Parameters.Board.maximumPawnOccupancy"
+	)
 	public boolean isBlockade(int coord) {
-		/* Precondition: pawnCoordinates are valid. (i.e., no exceeding occupancy, no pairs of different
-		 * colors, no illegal coordinates, so on.)
-		 */
 		/* NOTE: <= gives slightly more flexibility in the case that maximumPawnOccupancy is more than
 		 * the pawnsToFormBlockade; it would make for a weird game of parcheesi, but sure.
 		 */
