@@ -52,11 +52,9 @@ class TranslatedMove {
 		}
 
 		Board resultBoard = new Board(board);
-
 		for (Action action : actions) {
 			action.apply(die, pawn, resultBoard);
 		}
-
 		return resultBoard;
 	}
 
