@@ -32,10 +32,10 @@ public class ContractualInterceptor {
 
 	@AroundInvoke
 	public Object doTheThing(InvocationContext ctx) throws Exception {
-		System.out.println("Doing the thing!"
-				+ "\n\tto: " + ctx.getTarget().getClass().getName().split("\\$")[0]
+		System.out.println("Contractual Interceptor activated"
+				+ "\n\ton class: " + ctx.getTarget().getClass().getName().split("\\$")[0]
 					+ "{{hashcode:" + ctx.getTarget().hashCode() + "}}"
-				+ "\n\twhile it tries to: " + ctx.getMethod().getName()
+				+ "\n\tduring: " + ctx.getMethod().getName()
 		);
 
 		javascriptEngine.put("self", ctx.getTarget());
@@ -69,7 +69,7 @@ public class ContractualInterceptor {
 
 		// precondition
 		if (preconditionCode.equals("true")) {
-			System.out.println("Skipping empty precondition");
+			System.out.println("\tSkipping empty precondition");
 		} else {
 			javascriptEngine.eval(
 				"function Precondition (" + String.join(", ", parameterNames) + ") { "
@@ -77,9 +77,9 @@ public class ContractualInterceptor {
 				+ "}"
 			);
 
-			System.out.println("Evalutating precondition: " + preconditionCode);
+			System.out.println("\tEvalutating precondition:\n\t\t" + preconditionCode);
 			Object preconditionResult = invocableEngine.invokeFunction("Precondition", ctx.getParameters());
-			System.out.println(preconditionResult);
+			System.out.println("\tResult: " + preconditionResult);
 			if (!Boolean.valueOf(preconditionResult.toString())) {
 				throw new RuntimeException("Contract broken!");
 			}
@@ -89,7 +89,7 @@ public class ContractualInterceptor {
 
 		// postcondition
 		if (postconditionCode.equals("true")) {
-			System.out.println("Skipping empty postcondition");
+			System.out.println("\tSkipping empty postcondition");
 		} else {
 			parameterNames.add("result");
 
@@ -99,11 +99,11 @@ public class ContractualInterceptor {
 				+ "}"
 			);
 
-			System.out.println("Evalutating postcondition: " + postconditionCode);
+			System.out.println("\tEvalutating postcondition:\n\t\t" + postconditionCode);
 			ArrayList<Object> args = new ArrayList(Arrays.asList(ctx.getParameters()));
 			args.add(result);
 			Object postconditionResult = invocableEngine.invokeFunction("Postcondition", args.toArray());
-			System.out.println(postconditionResult);
+			System.out.println("\tResult: " + postconditionResult);
 			if (!Boolean.valueOf(postconditionResult.toString())) {
 				throw new RuntimeException("Contract broken!");
 			}
