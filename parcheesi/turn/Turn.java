@@ -29,14 +29,14 @@ public class Turn {
 	// Board in progress.
 	Board resultBoard;
 
-	public Turn(Player player, Board startBoard, Die[] startingDice) {
-		int startingDiceCount = startingDice.length;
+	public Turn(Player player, Board startBoard, List<Die> startingDice) {
+		int startingDiceCount = startingDice.size();
 
 		this.player = player;
 		this.startBoard = startBoard;
 		this.resultBoard = startBoard;
 
-		this.diceAvailable    = new ArrayList<Die>(Arrays.asList(startingDice));
+		this.diceAvailable    = new ArrayList<Die>(startingDice);
 		this.diceCombinations = generateDiceCombinations(diceAvailable);
 		this.movesAvailable   = generateMovesAvailable(diceCombinations, startBoard);
 
@@ -117,12 +117,12 @@ public class Turn {
 
 	public static void main(String[] args) throws Die.InvalidDieException {
 		Board board = new Board();
-		Turn t = new Turn(new parcheesi.player.StubPlayer(0), board, new Die[] {
+		Turn t = new Turn(new parcheesi.player.StubPlayer(0), board, Arrays.asList(
 			new parcheesi.die.NormalDie(5),
 			new parcheesi.die.NormalDie(5),
 			new parcheesi.die.NormalDie(2),
 			new parcheesi.die.NormalDie(2)
-		});
+		));
 
 		System.out.println(t.diceCombinations.size() == (4 + 12 + 24 + 24));
 
