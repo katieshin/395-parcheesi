@@ -8,13 +8,13 @@ public class Pawn {
 
 	public int playerIndex;
 
-	public Pawn (int id, Color.Player color) {
+	public Pawn(int id, Color.Player color) {
 		this.id = id;
 		this.color = color;
 		this.playerIndex = color.ordinal();
 	}
 
-	public Pawn (int id, String color) {
+	public Pawn(int id, String color) {
 		this(id, Color.Player.lookupByColorName(color));
 	}
 }
