@@ -11,6 +11,8 @@ import parcheesi.die.Die;
 import parcheesi.Board;
 import parcheesi.Color;
 
+import static parcheesi.Parameters.pawnsPerPlayer;
+
 public class SimplePlayer implements Player {
 	Color.Player color;
 	List<Pawn> pawns;
