@@ -60,6 +60,31 @@ class TranslatedMove {
 		return resultBoard;
 	}
 
+	/**
+	 * Detect whether the move is pointless; that is, a no-op.
+	 *
+	 * @return "true" if the move does nothing.
+	 */
+	public boolean isNoop() {
+		return actions.size() == 0;
+	}
+
+	public Die die() {
+		return die;
+	}
+
+	// FIXME: fjdkslajfkdlsa
+	void debugPrint() {
+		System.out.println(MoveClass);
+		System.out.println("Actions:...");
+		actions.stream().forEach(
+			a -> System.out.println(a.toString().substring("parcheesi.move.action.".length()))
+		);
+		System.out.println("From die: " + die.getValue());
+		System.out.println("From pawn: player " + pawn.playerIndex + " id " + pawn.id);
+		System.out.println("🧀 🧀 🧀");
+	}
+
 	private Class<? extends Move> getMoveClass(Die die, Pawn pawn, Board board)
 		throws IllegalStateException {
 		Board testBoard = new Board(board);
@@ -95,37 +120,26 @@ class TranslatedMove {
 	private static class TranslatedMoveTester extends parcheesi.test.Tester {
 		TranslatedMove tm;
 
-		void debug() {
-			System.out.println(tm.MoveClass);
-			System.out.println("Actions:...");
-			tm.actions.stream().forEach(
-				a -> System.out.println(a.toString().substring("parcheesi.move.action.".length()))
-			);
-			System.out.println("From die: " + tm.die.getValue());
-			System.out.println("From pawn: player " + tm.pawn.playerIndex + " id " + tm.pawn.id);
-			System.out.println("🧀 🧀 🧀");
-		}
-
 		public TranslatedMoveTester() throws Die.InvalidDieException {
 			Board board = new Board();
 			Pawn pawn   = new Pawn(0, parcheesi.Color.forPlayer(1));
 			Die die     = new parcheesi.die.NormalDie(5);
 
 			tm = new TranslatedMove(die, pawn, board);
-			debug();
+			tm.debugPrint();
 			board = tm.take(board);
 
 			tm = new TranslatedMove(tm.die, tm.pawn, board);
-			debug();
+			tm.debugPrint();
 
 			Pawn pawn2 = new Pawn(1, parcheesi.Color.forPlayer(1));
 			tm = new TranslatedMove(die, pawn2, board);
-			debug();
+			tm.debugPrint();
 			board = tm.take(board);
 
 			Pawn otherPawn = new Pawn(0, parcheesi.Color.forPlayer(0));
 			tm = new TranslatedMove(die, otherPawn, board);
-			debug();
+			tm.debugPrint();
 			board = tm.take(board);
 
 			board.movePawnForward(
@@ -134,7 +148,7 @@ class TranslatedMove {
 			);
 
 			tm = new TranslatedMove(die, otherPawn, board);
-			debug();
+			tm.debugPrint();
 		}
 	}
 }
