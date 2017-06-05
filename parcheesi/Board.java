@@ -645,35 +645,35 @@ public class Board {
 			);
 		}
 
-	static final int removePawnIterations = 10;
-	void removePawn() {
-		Board board = new Board();
-		Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
-
-		check(
-			!board.removePawn(pawn),
-			"Removing a pawn not on the board fails"
-		);
-
-		boolean addSuccess = board.addPawn(pawn);
-		check(
-			addSuccess && board.removePawn(pawn),
-			"Removing a pawn immediately after adding it succeeds"
-		);
-
-		java.util.Random rand = new java.util.Random();
-
-		for (int i = 0; i < removePawnIterations; i++) {
-			addSuccess = board.addPawn(pawn);
-			int moveDistance = rand.nextInt(maxPawnTravelDistance - 1) + 1; // NOTE: Always move >= 1 spc.
-			boolean moveSuccess = board.movePawnForward(pawn, moveDistance);
+		static final int removePawnIterations = 10;
+		void removePawn() {
+			Board board = new Board();
+			Pawn pawn = new Pawn(0, Color.forPlayer(0).getColorName());
 
 			check(
-				addSuccess && moveSuccess && board.removePawn(pawn),
-				"RANDOM TEST: A pawn can be removed from position " + (1 + moveDistance) + " on the board"
+				!board.removePawn(pawn),
+				"Removing a pawn not on the board fails"
 			);
+
+			boolean addSuccess = board.addPawn(pawn);
+			check(
+				addSuccess && board.removePawn(pawn),
+				"Removing a pawn immediately after adding it succeeds"
+			);
+
+			java.util.Random rand = new java.util.Random();
+
+			for (int i = 0; i < removePawnIterations; i++) {
+				addSuccess = board.addPawn(pawn);
+				int moveDistance = rand.nextInt(maxPawnTravelDistance - 1) + 1; // NOTE: Always move >= 1 spc.
+				boolean moveSuccess = board.movePawnForward(pawn, moveDistance);
+
+				check(
+					addSuccess && moveSuccess && board.removePawn(pawn),
+					"RANDOM TEST: A pawn can be removed from position " + (1 + moveDistance) + " on the board"
+				);
+			}
 		}
-	}
 
 		void movePawnForward() {
 			Board board = new Board();
