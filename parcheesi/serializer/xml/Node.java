@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class Node<T> {
+public class Node<T> {
 	private List<T> children = new ArrayList<T>();
 	private String name;
 

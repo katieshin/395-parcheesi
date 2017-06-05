@@ -32,14 +32,14 @@ public class Turn {
 	Board resultBoard;
 
 
-	public Turn(Player player, Board startBoard, Die[] startingDice) {
-		int startingDiceCount = startingDice.length;
+	public Turn(Player player, Board startBoard, List<Die> startingDice) {
+		int startingDiceCount = startingDice.size();
 
 		this.player = player;
 		this.startBoard = startBoard;
 		this.resultBoard = startBoard;
 
-		this.diceAvailable    = new ArrayList<Die>(Arrays.asList(startingDice));
+		this.diceAvailable    = new ArrayList<Die>(startingDice);
 		this.diceCombinations = generateDiceCombinations(diceAvailable);
 		this.movesAvailable   = generateMovesAvailable(diceCombinations, startBoard);
 		this.nextBoardsAvailable = generateNextMovesAvailable(this.movesAvailable, startBoard);
@@ -70,14 +70,14 @@ public class Turn {
 	public List<TranslatedMove> movesAvailable() {
 		return movesAvailable;
 	}
+
 	public Board resultBoard() {
 		return resultBoard;
 	}
-	public List<TranslatedMove> nextBoardsAvailable() {
+
+	public List<Board> nextBoardsAvailable() {
 		return nextBoardsAvailable;
 	}
-
-
 
 	// public void addDie(Die d) {
 	// 	diceAvailable.add(d);
@@ -101,14 +101,14 @@ public class Turn {
 
 		return moves.stream().filter((m) -> !m.isNoop()).collect(Collectors.toList());
 	}
-	List<TranslatedMove> generateNextMovesAvailable(List<TranslatedMove> moves, Board startBoard) {
+	List<Board> generateNextMovesAvailable(List<TranslatedMove> moves, Board startBoard) {
 		List<Board> boards = new ArrayList<Board>();
 
 		for (TranslatedMove move : moves) {
 			boards.add(move.take(startBoard));
 		}
 
-		return moves.stream().filter((m) -> !m.isNoop()).collect(Collectors.toList());
+		return boards;
 	}
 
 	List<Die> generateDiceCombinations(List<Die> diceAvailable) {
@@ -138,12 +138,12 @@ public class Turn {
 
 	public static void main(String[] args) throws Die.InvalidDieException {
 		Board board = new Board();
-		Turn t = new Turn(new parcheesi.player.StubPlayer(0), board, new Die[] {
+		Turn t = new Turn(new parcheesi.player.StubPlayer(0), board, Arrays.asList(
 			new parcheesi.die.NormalDie(5),
 			new parcheesi.die.NormalDie(5),
 			new parcheesi.die.NormalDie(2),
 			new parcheesi.die.NormalDie(2)
-		});
+		));
 
 		System.out.println(t.diceCombinations.size() == (4 + 12 + 24 + 24));
 

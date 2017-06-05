@@ -1,54 +1,74 @@
 package parcheesi.player;
 
+import java.util.List;
+import java.util.ArrayList;
+
+import parcheesi.turn.TranslatedMove;
+import parcheesi.die.NormalDie;
 import parcheesi.pawn.Pawn;
+import parcheesi.turn.Turn;
 import parcheesi.move.Move;
 import parcheesi.die.Die;
 import parcheesi.Board;
 import parcheesi.Color;
 
+import static parcheesi.Parameters.pawnsPerPlayer;
+
 public class SimplePlayer implements Player {
-	// TODO?
-	// NOTE: Stub
-	public SimplePlayer () { }
+	List<Pawn> pawns;
+	Color.Player color;
 
 	public void startGame(String color) {
 		this.color = Color.Player.lookupByColorName(color);
+
+		pawns = new ArrayList<Pawn>(pawnsPerPlayer);
+		for (int pi = 0; pi < pawnsPerPlayer; pi++) {
+			pawns.add(new Pawn(pi, this.color));
+		}
 	}
 
-	public Move[] doMove(Board board, int[] dice) {
-		// TODO
+	public Move[] doMove(Board board, int[] dieValues) {
+		List<Die> dice = new ArrayList<Die>(dieValues.length);
+		for (int dieValue : dieValues) {
+			try {
+				dice.add(new NormalDie(dieValue));
+			} catch (Die.InvalidDieException ex) {
+				// be sad
+			}
+		}
+
 		Turn myTurn = new Turn(this, board, dice);
 
 		List<Board> boards = myTurn.nextBoardsAvailable();
 
-		Move best;
+		TranslatedMove best;
 		int maxH = 0;
 		int maxHR = 0;
-		int maxRing = 0;
+		int maxMain = 0;
 		int maxSafe = 0;
 		int ct = 0;
-		for(Board board : boards)
+		for(Board b : boards)
 		{
 			int inH = 0;
 			int inHR = 0;
-			int inRing = 0;
+			int inMain = 0;
 			int inSafe = 0;
 			for(Pawn p : this.pawns())
 			{
-				if(board.inHome(p))
+				if(b.inHome(p))
 					inH++;
-				if(board.inHomeRow(p))
+				if(b.inHomeRow(p))
 					inHR++;
-				if(board.inMain(p))
-					inRing++;
-				if(board.inSafe(p))
+				if(b.inMain(p))
+					inMain++;
+				if(b.inSafe(p))
 					
 					inSafe++;
 			}
 
 			if(inH > maxH)
 			{
-				best = myTurn.turnsAvailable()[ct]
+				best = myTurn.movesAvailable().get(ct);
 				maxH = inH;
 				maxHR = inHR;
 				maxMain = inMain;
@@ -58,7 +78,7 @@ public class SimplePlayer implements Player {
 			{
 				if(inHR > maxHR)
 				{
-					best = myTurn.turnsAvailable()[ct]
+					best = myTurn.movesAvailable().get(ct);
 					maxH = inH;
 					maxHR = inHR;
 					maxMain = inMain;
@@ -68,7 +88,7 @@ public class SimplePlayer implements Player {
 				{
 					if(inMain > maxMain)
 					{
-						best = myTurn.turnsAvailable()[ct]
+						best = myTurn.movesAvailable().get(ct);
 						maxH = inH;
 						maxHR = inHR;
 						maxMain = inMain;
@@ -78,7 +98,7 @@ public class SimplePlayer implements Player {
 					{
 						if(inSafe >= maxSafe)
 						{
-							best = myTurn.turnsAvailable()[ct]
+							best = myTurn.movesAvailable().get(ct);
 							maxH = inH;
 							maxHR = inHR;
 							maxMain = inMain;
@@ -98,5 +118,9 @@ public class SimplePlayer implements Player {
 	public void DoublesPenalty() {
 		// TODO
 		// getFurthestPawn().restart();
+	}
+
+	public List<Pawn> pawns() {
+		return pawns;
 	}
 }

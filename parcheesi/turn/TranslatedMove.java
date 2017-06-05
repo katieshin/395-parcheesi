@@ -13,7 +13,7 @@ import parcheesi.pawn.Pawn;
 import parcheesi.die.Die;
 import parcheesi.Board;
 
-class TranslatedMove {
+public class TranslatedMove {
 	private Class<? extends Move> MoveClass;
 	private List<Action> actions;
 	private Die die;
