@@ -12,4 +12,8 @@ public abstract class Die {
 	public int getValue() {
 		return this.value;
 	}
+
+	public boolean has(Die die) {
+		return this.equals(die);
+	}
 }

@@ -12,4 +12,9 @@ public class CombinedDie extends Die {
 	public int getValue () {
 		return firstDie.getValue() + secondDie.getValue();
 	}
+
+	@Override
+	public boolean has(Die die) {
+		return firstDie.has(die) || secondDie.has(die) || die.has(firstDie) || die.has(secondDie);
+	}
 }
