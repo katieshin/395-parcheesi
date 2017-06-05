@@ -109,11 +109,11 @@ public class Board {
 	}
 
 	public boolean inHome(Pawn p) {
-		return locations[this.getPawnCoordinate(p)] instanceof Home;
+		return !this.inNest(p) && locations[this.getPawnCoordinate(p)] instanceof Home;
 	}
 
 	public boolean inHomeRow(Pawn p) {
-		return locations[this.getPawnCoordinate(p)] instanceof HomeRow;
+		return !this.inNest(p) && locations[this.getPawnCoordinate(p)] instanceof HomeRow;
 	}
 
 	public boolean inMain(Pawn p) {
