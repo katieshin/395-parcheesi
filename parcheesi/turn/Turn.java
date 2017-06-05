@@ -63,6 +63,10 @@ public class Turn {
 		}
 	}
 
+	public List<TranslatedMove> movesAvailable() {
+		return movesAvailable;
+	}
+
 	// public void addDie(Die d) {
 	// 	diceAvailable.add(d);
 	// 	// NOTE: inefficiency: regenerates all combinations instead of updating with just the new ones.
