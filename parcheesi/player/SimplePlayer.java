@@ -1,49 +1,102 @@
 package parcheesi.player;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import parcheesi.die.NormalDie;
 import parcheesi.pawn.Pawn;
-import parcheesi.turn.Turn;
 import parcheesi.move.Move;
 import parcheesi.die.Die;
 import parcheesi.Board;
 import parcheesi.Color;
 
-import static parcheesi.Parameters.pawnsPerPlayer;
-
 public class SimplePlayer implements Player {
-	Color.Player color;
-	List<Pawn> pawns;
+	// TODO?
+	// NOTE: Stub
+	public SimplePlayer () { }
 
 	public void startGame(String color) {
 		this.color = Color.Player.lookupByColorName(color);
-
-		this.pawns = new ArrayList<Pawn>(pawnsPerPlayer);
-		for (int pi = 0; pi < pawnsPerPlayer; pi++) {
-			this.pawns.add(new Pawn(pi, color));
-		}
 	}
 
-	public Move[] doMove(Board board, int[] dieValues) {
+	public Move[] doMove(Board board, int[] dice) {
 		// TODO
-		List<Die> dice = new ArrayList<Die>(dieValues.length);
-		for (int dieValue : dieValues) {
-			dice.add(new NormalDie(dieValue));
-		}
-
 		Turn myTurn = new Turn(this, board, dice);
 
-		return new Move[] {};
+		List<Board> boards = myTurn.nextBoardsAvailable();
+
+		Move best;
+		int maxH = 0;
+		int maxHR = 0;
+		int maxRing = 0;
+		int maxSafe = 0;
+		int ct = 0;
+		for(Board board : boards)
+		{
+			int inH = 0;
+			int inHR = 0;
+			int inRing = 0;
+			int inSafe = 0;
+			for(Pawn p : this.pawns())
+			{
+				if(board.inHome(p))
+					inH++;
+				if(board.inHomeRow(p))
+					inHR++;
+				if(board.inMain(p))
+					inRing++;
+				if(board.inSafe(p))
+					
+					inSafe++;
+			}
+
+			if(inH > maxH)
+			{
+				best = myTurn.turnsAvailable()[ct]
+				maxH = inH;
+				maxHR = inHR;
+				maxMain = inMain;
+				maxSafe = inSafe;
+			}
+			if(inH == maxH)
+			{
+				if(inHR > maxHR)
+				{
+					best = myTurn.turnsAvailable()[ct]
+					maxH = inH;
+					maxHR = inHR;
+					maxMain = inMain;
+					maxSafe = inSafe;
+				}
+				if(inHR == maxHR)
+				{
+					if(inMain > maxMain)
+					{
+						best = myTurn.turnsAvailable()[ct]
+						maxH = inH;
+						maxHR = inHR;
+						maxMain = inMain;
+						maxSafe = inSafe;
+					}
+					if(inMain == maxMain)
+					{
+						if(inSafe >= maxSafe)
+						{
+							best = myTurn.turnsAvailable()[ct]
+							maxH = inH;
+							maxHR = inHR;
+							maxMain = inMain;
+							maxSafe = inSafe;
+						}
+					}
+				}
+			}
+			ct++;
+			if(ct > 100)
+				break;
+		}
+
+		return best;
 	}
 
 	public void DoublesPenalty() {
 		// TODO
 		// getFurthestPawn().restart();
-	}
-
-	public List<Pawn> pawns() {
-		return pawns;
 	}
 }
