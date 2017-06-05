@@ -132,11 +132,6 @@ public class Board {
 		+ " && coord < Parameters.Board.size"
 		+ " && self.getPawnsAtCoordinate(coord).length >= 1"
 	)
-	// "result" is a special alias for the output after invoking the function
-	@Postcondition(
-		"result >= 0"
-		+ " && result <= Parameters.Board.maximumPawnOccupancy"
-	)
 	public boolean isBlockade(int coord) {
 		/* NOTE: <= gives slightly more flexibility in the case that maximumPawnOccupancy is more than
 		 * the pawnsToFormBlockade; it would make for a weird game of parcheesi, but sure.
@@ -312,6 +307,11 @@ public class Board {
 		return distance;
 	}
 
+	// "result" is a special alias for the output after invoking the function
+	@Postcondition(
+		"result >= 0"
+		+ " && result <= Parameters.Board.maximumPawnOccupancy"
+	)
 	public List<Pawn> getPawnsAtCoordinate(int coord) {
 		/* NOTE: this ArrayList will need to be resized if the board is currently invalid but that's
 		 * okay. We will catch an error, if there is one, when we run the RulesChecker.
