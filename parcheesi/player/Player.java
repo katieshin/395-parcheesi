@@ -1,6 +1,9 @@
 package parcheesi.player;
 
+import java.util.List;
+
 import parcheesi.move.Move;
+import parcheesi.pawn.Pawn;
 import parcheesi.Board;
 
 // NOTE: Do not change this interface!
@@ -15,4 +18,6 @@ public interface Player {
 	// inform the player that they have suffered
 	// a doubles penalty
 	void DoublesPenalty();
+
+	List<Pawn> pawns();
 }
