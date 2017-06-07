@@ -39,6 +39,16 @@ public class NetworkPlayer {
 				System.out.println(message);
 				messageXML = deserializer.parse(message);
 
+				if (messageXML.name == "start-game") {
+					// color
+				} else if (messageXML.name == "do-move") {
+					// board, dice
+				} else if (messageXML.name == "doubles-penalty") {
+					// void
+				} else {
+					// weep
+				}
+
 				String out = Name().child("my Name Is What").toString();
 				System.out.println(out);
 

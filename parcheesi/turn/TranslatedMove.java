@@ -71,6 +71,18 @@ public class TranslatedMove {
 		return die;
 	}
 
+	// public Move toMove() {
+	// 	if (MoveClass == MoveMain.class) {
+	// 		new MoveMain(pawn, )
+	// 	} else if (MoveClass == MoveHome.class) {
+
+	// 	} else if (MoveClass == EnterPiece.class) {
+
+	// 	} else {
+	// 		// weep
+	// 	}
+	// }
+
 	// FIXME: fjdkslajfkdlsa
 	void debugPrint() {
 		System.out.println(MoveClass);

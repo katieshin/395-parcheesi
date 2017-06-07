@@ -24,7 +24,8 @@ public class Main {
 
 		// All of these will generate log messages because of instrumentation
 		board.addPawn(p);
-		board.getPawnCoordinate(p);
+		board.movePawnForward(p, 1);
+		board.getPawnsAtCoordinate(board.getPawnCoordinate(p));
 		board.equals(board2);
 		board.isBlockade(board.getPawnCoordinate(p));
 	}

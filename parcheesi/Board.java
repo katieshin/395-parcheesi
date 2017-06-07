@@ -230,6 +230,9 @@ public class Board {
 		pawnCoordinates.put(pawn, coordinate);
 	}
 
+	@Postcondition(
+		"self.getPawnsAtCoordinate(pawn).size() <= Parameters.Board.maximumPawnOccupancy"
+	)
 	public boolean movePawnForward(Pawn pawn, int spaces) {
 		int currentCoordinate = getPawnCoordinate(pawn);
 
@@ -309,8 +312,7 @@ public class Board {
 
 	// "result" is a special alias for the output after invoking the function
 	@Postcondition(
-		"result >= 0"
-		+ " && result <= Parameters.Board.maximumPawnOccupancy"
+		"result.size() <= Parameters.Board.maximumPawnOccupancy"
 	)
 	public List<Pawn> getPawnsAtCoordinate(int coord) {
 		/* NOTE: this ArrayList will need to be resized if the board is currently invalid but that's

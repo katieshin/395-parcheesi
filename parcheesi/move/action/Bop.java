@@ -19,18 +19,14 @@ public class Bop implements Action {
 
 	public boolean isApplicable(Class<? extends Move> MoveClass, Die die, Pawn pawn, Board board) {
 		Board testBoard = new Board(board);
+		return actionIsApplicable(BopEnter.action, die, pawn, testBoard)
+			|| actionIsApplicable(BopMoveForward.action, die, pawn, testBoard);
+	}
 
-		if (BopEnter.action.isApplicable(MoveClass, die, pawn, testBoard)) {
-			return BopEnter.action.apply(die, pawn, testBoard)
-				&& findBopTarget(pawn, testBoard).isPresent();
-		} else if (BopMoveForward.action.isApplicable(MoveClass, die, pawn, testBoard)) {
-			if (BopMoveForward.action.apply(die, pawn, testBoard)) {
-				Optional<Pawn> bopTarget = findBopTarget(pawn, testBoard);
-				return bopTarget.isPresent() && !board.inSafe(bopTarget.get());
-			}
-		}
-
-		return false;
+	private boolean actionIsApplicable(Action action, Die die, Pawn pawn, Board board) {
+		return action.isApplicable(MoveClass, die, pawn, testBoard)
+			&& action.apply(die, pawn, testBoard)
+			&& findBopTarget(pawn, testBoard).isPresent();
 	}
 
 	public boolean apply(Die die, Pawn pawn, Board board) {

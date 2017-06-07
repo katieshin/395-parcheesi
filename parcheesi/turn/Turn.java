@@ -101,6 +101,7 @@ public class Turn {
 
 		return moves.stream().filter((m) -> !m.isNoop()).collect(Collectors.toList());
 	}
+
 	List<Board> generateNextMovesAvailable(List<TranslatedMove> moves, Board startBoard) {
 		List<Board> boards = new ArrayList<Board>();
 
@@ -127,8 +128,8 @@ public class Turn {
 		List<Die> combinations = new ArrayList<Die>();
 
 		for (Die die1 : dice1) {
-			List<Die> intersect = dice2.stream().filter((d) -> !die1.has(d)).collect(Collectors.toList());
-			for (Die die2 : intersect) {
+			List<Die> unique = dice2.stream().filter((d) -> !die1.has(d)).collect(Collectors.toList());
+			for (Die die2 : unique) {
 				combinations.add(new CombinedDie(die1, die2));
 			}
 		}
@@ -162,7 +163,7 @@ public class Turn {
 		// Quintuples -- of which there are none
 		List<Die> quintuples = t.dieCombinations(quadruples, t.diceAvailable);
 		// System.out.println(quintuples.stream().count() == 0);
-		
+
 		t.movesAvailable.forEach((m) -> m.debugPrint());
 		t.takeMove(t.movesAvailable.get(0));
 		System.out.println("-------------------------");

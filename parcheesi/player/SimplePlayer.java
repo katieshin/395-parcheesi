@@ -62,7 +62,6 @@ public class SimplePlayer implements Player {
 				if(b.inMain(p))
 					inMain++;
 				if(b.inSafe(p))
-					
 					inSafe++;
 			}
 
